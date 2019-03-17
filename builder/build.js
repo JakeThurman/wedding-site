@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const showdown = require('showdown');
 const handlebars = require('handlebars');
 const fs = require('fs');
@@ -15,7 +16,8 @@ const template = handlebars.compile(templateSource);
 
 // Generate the full html content
 const fullHTML = template({ 
-    body: htmlOfMD("../dev/body.md")  
+    body: htmlOfMD("../dev/body.md"),
+    id: crypto.randomBytes(16).toString("hex"),  
 });
 
 // Write the output file
