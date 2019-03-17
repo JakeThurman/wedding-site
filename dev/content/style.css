@@ -6,7 +6,7 @@ body {
 }
 
 h1 + p {
-	text-indent: 2em;
+	text-indent: 1.25rem;
 }
 
 div {
@@ -15,7 +15,7 @@ div {
 
 p {
 	font-family: 'Playfair Display', serif;
-	line-height: 1.5em;
+	line-height: 1.5rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -25,17 +25,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-	font-size: 4em;
+	font-size: 4rem;
 }
 
 h2 {
-	font-size: 3em;
+	font-size: 3rem;
 }
 
 h2:after {
     border-bottom: 1px solid #2f2f2f;
     content: '';
-    width: 100px;
+    width: 7rem;
     display: block;
     margin: 0 auto;
     height: 1px;
@@ -44,14 +44,14 @@ h2:after {
 img {
 	width: 100%;
 	height: auto;
-	margin-bottom: 20px;
+	margin-bottom: 2rem;
 	box-shadow: -1px 1px 5px 0px #333;
 }
 
 #md-content {
-	max-width: 750px;
+	max-width: 50rem;;
 	margin: 0 auto;
-	padding: 20px;
-	padding-bottom: 130px;
+	padding: 2rem;
+	padding-bottom: 10rem;
 }
 
