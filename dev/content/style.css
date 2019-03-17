@@ -5,6 +5,10 @@ body {
 	color: #444444;
 }
 
+h1 + p {
+	text-indent: 2em;
+}
+
 div {
 	box-sizing: border-box;
 }
