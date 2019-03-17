@@ -1,0 +1,7 @@
+#!/bin/sh
+
+#fail on error
+set -e
+
+sh build
+firebase deploy
