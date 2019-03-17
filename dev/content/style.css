@@ -45,7 +45,7 @@ img {
 	width: 100%;
 	height: auto;
 	margin-bottom: 2rem;
-	box-shadow: -1px 1px 5px 0px #333;
+	box-shadow: -1px 1px 5px -1px #333;
 }
 
 #md-content {
