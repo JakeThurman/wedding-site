@@ -34,6 +34,8 @@ header {
 h1 {
 	padding: 1rem;
 	margin: 0;
+	text-align: left;
+    display: inline-block;
 }
 
 h2 {
@@ -86,30 +88,14 @@ header a:hover, header a:focus {
 	padding: 4rem 2rem 10rem 2rem;
 }
 
-#open-rsvp {
-	position: fixed;
-	right: 0;
-	top: 0;
-	padding: 1rem 2.5rem;
-	border: none;
-	border-bottom-left-radius: 0.75rem;
+.open-rsvp {
+	float: right;
+	font-style: italic;
 	cursor: pointer;
-	box-shadow: 2px -4px 15px 1px #757575;
-	background-color: #A9CEF4;
-	color: #2f2f2f;
-	font-size: 1.2rem;
+	height: 100%;
+	font-size: 1.5rem;
+	padding: 1.2rem;
 	font-family: 'Playfair Display', serif;
-	text-decoration: none;
-}
-
-#open-rsvp:hover, #open-rsvp:focus, #open-rsvp:active {
-	text-decoration: none;
-	background-color: #a4caf1;
-	box-shadow: 2px -4px 20px 1px #757575;
-}
-
-#open-rsvp:active {
-	box-shadow: 2px -4px 25px 1px #333;
 }
 
 

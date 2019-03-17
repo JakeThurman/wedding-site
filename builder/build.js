@@ -23,31 +23,23 @@ const htmlWriter = (template) => (name, settings) => writeFile(name, template(se
 // Grab a writer for the main template
 const generateFromTemplate = htmlWriter(templateOf("../dev/template.html"));
 
-
-// Render params
-const rsvpIsReady = false;
-
 // Pages to render
 const pages = {
 	"index.html": {
-	    body: htmlOfMD("../dev/index.md"),
-	    canRSVP: rsvpIsReady,
-	    id: buildid,  
+		body: htmlOfMD("../dev/index.md"),
+		id: buildid,  
 	},
 	"engagementphotos.html": {
-	    body: htmlOfMD("../dev/engagementphotos.md"),
-	    canRSVP: rsvpIsReady,
-	    id: buildid,  
+		body: htmlOfMD("../dev/engagementphotos.md"),
+		id: buildid,  
 	},
 	"rsvp.html": {
-   		body: mdConverter.makeHtml(`
-# [Melissa & Jake](index.html)
+		body: mdConverter.makeHtml(`
+## Send Response
 
 Sorry, RSVPs are not yet being accepted.
-Thanks for trying to get back to us so quickly!
-    	`),
-    	canRSVP: false,
-    	id: buildid,  
+		`),
+		id: buildid,  
 	},
 };
 
