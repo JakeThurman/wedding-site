@@ -2,7 +2,7 @@
 
 Melissa Lueken & Jake Thurman were engaged March 2nd, 2019.
 
-![Engagement Photo](./images/ring.jpg)
+![Engagement Photo](./content/ring.jpg)
 
 
 

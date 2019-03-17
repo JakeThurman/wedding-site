@@ -1,0 +1,9 @@
+#!/bin/sh
+  
+#fail on error
+set -e
+
+mkdir -p ../public
+npm install
+node build.js
+cp -r ../dev/content ../public

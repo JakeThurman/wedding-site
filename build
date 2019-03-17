@@ -1,0 +1,11 @@
+#!/bin/sh
+
+#fail on error
+set -e
+
+pushd builder
+
+sh build
+
+popd
+
