@@ -13,11 +13,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   </head>
   <body>
-    {{#if isHome}}
+    {{#if canRSVP}}
       <a href="rsvp.html" id="open-rsvp">RSVP</a>
-    {{else}}
-      <a href="index.html" id="open-rsvp">Home</a>
     {{/if}}
-    <div id="md-content">{{{body}}}</div>
+    <div id="md-content">
+      <h1><a href="index.html">Melissa &amp; Jake</a></h1>
+      {{{body}}}
+    </div>
   </body>
 </html>

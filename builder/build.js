@@ -21,22 +21,36 @@ const templateOf = filename => handlebars.compile(contentOf(filename))
 const htmlWriter = (template) => (name, settings) => writeFile(name, template(settings)); 
 
 // Grab a writer for the main template
-const mainTemplate = htmlWriter(templateOf("../dev/index.html"));
+const generateFromTemplate = htmlWriter(templateOf("../dev/index.html"));
 
- // Generate the full html content on main pages
-mainTemplate("index.html", {
-    body: htmlOfMD("../dev/body.md"),
-    isHome: true,
-    id: buildid,  
-});
-mainTemplate("rsvp.html", {
-    body: mdConverter.makeHtml(`
-# Melissa & Jake
+
+// Render params
+const rsvpIsReady = false;
+
+// Pages to render
+const pages = {
+	"index.html": {
+	    body: htmlOfMD("../dev/body.md"),
+	    canRSVP: rsvpIsReady,
+	    id: buildid,  
+	},
+	"engagementphotos.html": {
+	    body: htmlOfMD("../dev/engagementphotos.md"),
+	    canRSVP: rsvpIsReady,
+	    id: buildid,  
+	},
+	"rsvp.html": {
+   		body: mdConverter.makeHtml(`
+# [Melissa & Jake](index.html)
 
 Sorry, RSVPs are not yet being accepted.
 Thanks for trying to get back to us so quickly!
-    `),
-    isHome: false,
-    id: buildid,  
-});
+    	`),
+    	canRSVP: false,
+    	id: buildid,  
+	},
+};
 
+// Render each of the pages to an appropriate file
+Object.keys(pages).forEach(name => 
+	generateFromTemplate(name, pages[name]));

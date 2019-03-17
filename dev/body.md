@@ -1,8 +1,6 @@
-# Melissa & Jake
-
 Melissa Lueken and Jake Thurman were engaged March 2nd, 2019 and are excited for their future together. **They will be married on October 19th, 2019** in Peoria, IL. 
 
-![Jake and Melissa's Engagement Photo](./content/us.jpg)
+![Jake and Melissa's Engagement Photo](./content/images/us.jpg)
 
 
 ## Save The Date
@@ -15,9 +13,9 @@ Melissa Lueken and Jake Thurman were engaged March 2nd, 2019 and are excited for
 
  
 
-![Goofy Engagement Photo](./content/goofy.jpg)
+![Goofy Engagement Photo](./content/images/goofy.jpg)
 
-![Photo of Engagement Ring](./content/ring.jpg)
+![Photo of Engagement Ring](./content/images/ring.jpg)
 
-*Photos by Kristin Thurman*
+[View all Engagement Photos](./engagementphotos.html)
 
