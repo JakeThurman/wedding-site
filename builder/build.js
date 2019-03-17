@@ -21,7 +21,7 @@ const templateOf = filename => handlebars.compile(contentOf(filename))
 const htmlWriter = (template) => (name, settings) => writeFile(name, template(settings)); 
 
 // Grab a writer for the main template
-const generateFromTemplate = htmlWriter(templateOf("../dev/index.html"));
+const generateFromTemplate = htmlWriter(templateOf("../dev/template.html"));
 
 
 // Render params
@@ -30,7 +30,7 @@ const rsvpIsReady = false;
 // Pages to render
 const pages = {
 	"index.html": {
-	    body: htmlOfMD("../dev/body.md"),
+	    body: htmlOfMD("../dev/index.md"),
 	    canRSVP: rsvpIsReady,
 	    id: buildid,  
 	},

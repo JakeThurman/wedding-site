@@ -1,12 +1,12 @@
+* {
+	box-sizing: border-box;
+}
+
 body {
 	margin: 0;
 	padding: 0;
 	background-color: #fefefe;
 	color: #444444;
-}
-
-h1 + p {
-	text-indent: 1.25rem;
 }
 
 div {
@@ -15,7 +15,7 @@ div {
 
 p {
 	font-family: 'Playfair Display', serif;
-	line-height: 1.5rem;
+	line-height: 1.75rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -24,8 +24,16 @@ h1, h2, h3, h4, h5, h6 {
 	color: #2f2f2f;
 }
 
+header {
+	background-color: #597081;
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+
 h1 {
-	font-size: 4rem;
+	padding: 1rem;
+	margin: 0;
 }
 
 h2 {
@@ -33,13 +41,18 @@ h2 {
 }
 
 h2:after {
-    border-bottom: 1px solid #2f2f2f;
-    content: '';
-    width: 7rem;
-    display: block;
-    margin: 0 auto;
-    height: 1px;
+	border-bottom: 1px solid #2f2f2f;
+	content: '';
+	width: 7rem;
+	display: block;
+	margin: 0 auto;
+	height: 1px;
 }
+
+h2 + p {
+	text-indent: 1.25rem;
+}
+
 
 img {
 	width: 100%;
@@ -48,29 +61,29 @@ img {
 	box-shadow: -1px 1px 5px -1px #757575;
 }
 
-h1 a {
-    color: #2f2f2f;
+a {
+	color: #08A4BD;
+	text-decoration: none;
+}
+
+a:hover, a:focus {
+	text-decoration: underline;
+}
+
+header a {
+    color: white;
     text-decoration: none;
 }
 
-h1 a:hover {
-    color: #08A4BD;
-}
-
-p a {
-    color: #08A4BD;
-    text-decoration: none;
-}
-
-p a:hover {
-    text-decoration: underline;
+header a:hover, header a:focus {
+	color: #DDDDDD;
+	text-decoration: none;
 }
 
 #md-content {
 	max-width: 50rem;;
 	margin: 0 auto;
-	padding: 2rem;
-	padding-bottom: 10rem;
+	padding: 4rem 2rem 10rem 2rem;
 }
 
 #open-rsvp {
