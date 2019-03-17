@@ -19,30 +19,18 @@ const htmlOfMD = mdFile => mdConverter.makeHtml(contentOf(mdFile));
 // Handlebar use helpers
 const templateOf = filename => handlebars.compile(contentOf(filename))
 const htmlWriter = (template) => (name, settings) => writeFile(name, template(settings)); 
+const templateSettings = body => ({ body, id: buildid });
 
 // Grab a writer for the main template
 const generateFromTemplate = htmlWriter(templateOf("../dev/template.html"));
 
 // Pages to render
-const pages = {
-	"index.html": {
-		body: htmlOfMD("../dev/index.md"),
-		id: buildid,  
-	},
-	"engagementphotos.html": {
-		body: htmlOfMD("../dev/engagementphotos.md"),
-		id: buildid,  
-	},
-	"rsvp.html": {
-		body: mdConverter.makeHtml(`
-## Send Response
-
-Sorry, RSVPs are not yet being accepted.
-		`),
-		id: buildid,  
-	},
+const pagesToSettings = {
+	"index.html": templateSettings(htmlOfMD("../dev/index.md")),
+	"engagementphotos.html": templateSettings(htmlOfMD("../dev/engagementphotos.md")),
+	"rsvp.html": templateSettings(templateOf('../dev/rsvp.html')({id: buildid})),
 };
 
 // Render each of the pages to an appropriate file
-Object.keys(pages).forEach(name => 
-	generateFromTemplate(name, pages[name]));
+Object.keys(pagesToSettings).forEach(name => 
+	generateFromTemplate(name, pagesToSettings[name]));
