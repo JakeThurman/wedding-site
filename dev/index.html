@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>Melissa &amp; Jake</title>
@@ -13,6 +13,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   </head>
   <body>
+    {{#if isHome}}
+      <a href="rsvp.html" id="open-rsvp">RSVP</a>
+    {{else}}
+      <a href="index.html" id="open-rsvp">Home</a>
+    {{/if}}
     <div id="md-content">{{{body}}}</div>
   </body>
 </html>

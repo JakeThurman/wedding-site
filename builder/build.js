@@ -3,26 +3,40 @@ const showdown = require('showdown');
 const handlebars = require('handlebars');
 const fs = require('fs');
 
-// Helper that loads the content of a file as a string
-const contentOf = filename => fs.readFileSync(filename, 'utf8');
-
-// Allow us to get out HTML from a given markdown file
+const buildid = crypto.randomBytes(16).toString("hex")
 const mdConverter = new showdown.Converter();
+
+// File Helpers
+const contentOf = filename => fs.readFileSync(filename, 'utf8');
+const writeFile = (filename, content) => fs.writeFile("../public/" + filename, content, err => {
+	if(err) throw err;
+    console.log(`${filename} - COMPLETE`);
+}); 
+
+// Markdown paring helper
 const htmlOfMD = mdFile => mdConverter.makeHtml(contentOf(mdFile));
 
-// Compile the handlebar template for index.html
-const templateSource = contentOf("../dev/index.html");
-const template = handlebars.compile(templateSource);
+// Handlebar use helpers
+const templateOf = filename => handlebars.compile(contentOf(filename))
+const htmlWriter = (template) => (name, settings) => writeFile(name, template(settings)); 
 
-// Generate the full html content
-const fullHTML = template({ 
+// Grab a writer for the main template
+const mainTemplate = htmlWriter(templateOf("../dev/index.html"));
+
+ // Generate the full html content on main pages
+mainTemplate("index.html", {
     body: htmlOfMD("../dev/body.md"),
-    id: crypto.randomBytes(16).toString("hex"),  
+    isHome: true,
+    id: buildid,  
 });
+mainTemplate("rsvp.html", {
+    body: mdConverter.makeHtml(`
+# Melissa & Jake
 
-// Write the output file
-fs.writeFile("../public/index.html", fullHTML, function(err) {
-    if(err) throw err;
-    console.log("The file was saved!");
-}); 
+Sorry, RSVPs are not yet being accepted.
+Thanks for trying to get back to us so quickly!
+    `),
+    isHome: false,
+    id: buildid,  
+});
 
