@@ -10,22 +10,39 @@
 		"projectId": "melissa-and-jake-wedding"
 	});
 
-	// Helper functions to get dom nodes
-	var fieldAccess = {
-		text: function (id) { return document.getElementById(id) || {}; },
-		radio: function (name) { return document.querySelector('input[name="' + name + '"]:checked') || {}; },
-	};
-
-
 	// --Get Dom nodes--
-	var form = document.getElementById("rsvp-form");
-	var countNode = document.getElementById('responses-count');
-	var fields = {
-		"name": "text", 
-		"note": "text", 
-		"can_attend": "radio"
-	};
+	var form = document.getElementById("rsvp-form") || {};
+	var countNode = document.getElementById('responses-count') || {};
+	var validationContainer = document.getElementById("validation-msg") || {};
 
+	function getFields() {
+		var f_name = document.getElementById("name") || {};
+		var f_note = document.getElementById("note") || {};
+		var f_can_attend = document.querySelector('input[name="can_attend"]:checked') || {};
+
+		return [
+			{
+				id: "name",
+				el: f_note,
+				validationMessage: f_name.value ? null : "Please include your name.",
+				value: f_name.value || "",
+				reset: function () { f_name.value = "" }
+			},
+			{
+				id: "note",
+				el: f_note,
+				value: f_note.value || "",
+				reset: function () { f_note.value = "" }
+			},
+			{
+				id: "can_attend",
+				el: f_can_attend,
+				validationMessage: f_can_attend.value ? null : "Please make an attendence selection.",
+				value: f_can_attend.value == "true",
+				reset: function () { f_can_attend.checked = false }
+			},
+		];
+	};
 
 	function renderWithUser(user) {
 		var ref = firebase.database().ref("users/" + user.uid + "/rsvps");
@@ -37,18 +54,28 @@
 		var onSubmit = function (e) { 
 			e.preventDefault();
 
-			var data = {};
+			var fields = getFields();
 
-			Object.keys(fields)
-				.forEach(function (id) {
+			var errorMessage = fields.reduce(function (result, field) {
+				return result || field.validationMessage;
+			}, null);
+
+			// Show error/replace with empty string if none.
+			validationContainer.innerText = errorMessage || "";
+			validationContainer.classList.toggle("form-group", !!errorMessage);
+
+			// Submit the form
+			if (!errorMessage) {
+				var data = {};
+
+				fields.forEach(function (f) {
 					// Record and clear the value of each field
-					var field = fieldAccess[fields[id]](id);
-					data[id] = field.value;
-					field.value = "";
+					data[f.id] = f.value;
+					f.reset();
 				});
 
-			// Write the response to firebase
-			ref.push(data);
+				ref.push(data);
+			}
 		};
 
 		// Register the listener

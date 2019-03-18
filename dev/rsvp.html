@@ -2,31 +2,32 @@
 
 <p><span id="responses-count">No</span> response(s) sent.</p>
 
-<form id="rsvp-form">
-
+<form id="rsvp-form">	
 	<div class="form-group">Please Submit an RSVP for each guest.</div>
-
+	<div id='validation-msg' class="validation-msg"></div>
+	
 	<div class="form-group">
 		<label for="name">Name</label>
 		<input class="form-control" id="name">
+		<div class="validation-msg"></div>
 	</div>
 
 	<div class="form-group">
 		<label>Attendance</label>
 		<div class="radio-bttn">
-			<input type="radio" name="can_attend" id="can_attend--yes">
+			<input type="radio" value="true" name="can_attend" id="can_attend--yes">
 			<label for="can_attend--yes">Joyfully Accepts</label>
 		</div>
 		<div class="radio-bttn">
-			<input type="radio" name="can_attend" id="can_attend--no">
+			<input type="radio" value="false" name="can_attend" id="can_attend--no">
 			<label for="can_attend--no">Regretfully Declines</label>
 		</div>
-
 	</div>
 
 	<div class="form-group">
 		<label for="note">Note</label>
 		<textarea class="form-control" id="note"></textarea>
+		<div class="validation-msg"></div>
 	</div>
 
 	<button type="submit">Submit</button>

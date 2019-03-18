@@ -17,7 +17,7 @@
 	function countOfRsvpsWhere(people, predicate) {
 		return people.reduce(function (soFar, next) {
 				return soFar + next.rsvps.filter(predicate).length;
-		}, 0);	
+		}, 0);
 	} 
 
 	function renderWithUser(user) {
@@ -71,7 +71,7 @@
 
 	function renderWithoutUser() {
 		container.innerText = "An Error Occured: Authorization not completed.";
-		
+
 		// No cleanup
 		return function () {};
 	}
@@ -81,7 +81,7 @@
 	firebase.auth().onAuthStateChanged(function(user) {
 		cleanupLast();
 		cleanupLast = user ? renderWithUser(user) : renderWithoutUser();
-		
+
 		// Oh: We didn't log in yet!
 		if (!user) {
 			firebase.auth().signInAnonymously();
