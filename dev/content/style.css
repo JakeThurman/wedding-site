@@ -234,7 +234,7 @@ textarea.form-control {
 /*Adding focus styles on the outer-box of the fake checkbox*/
 .radio-bttn input[type="radio"]:focus + label::before,
 .radio-bttn input[type="radio"]:active + label::before {
-	background-color: #fafafb;
+	background-color: #f1f1f1;
 }
 
 

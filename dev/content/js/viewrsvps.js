@@ -81,11 +81,11 @@
 	firebase.auth().onAuthStateChanged(function(user) {
 		cleanupLast();
 		cleanupLast = user ? renderWithUser(user) : renderWithoutUser();
+		
+		// Oh: We didn't log in yet!
+		if (!user) {
+			firebase.auth().signInAnonymously();
+		}
 	});
-
-	// --Setup--
-	if (!firebase.auth().currentUser) {
-		firebase.auth().signInAnonymously();
-	}
 
 })();
