@@ -7,6 +7,7 @@ body {
 	padding: 0;
 	background-color: #fefefe;
 	color: #444444;
+	font-family: 'Playfair Display', serif;
 }
 
 div {
@@ -14,7 +15,6 @@ div {
 }
 
 p {
-	font-family: 'Playfair Display', serif;
 	line-height: 1.75rem;
 }
 
@@ -82,6 +82,29 @@ header a:hover, header a:focus {
 	text-decoration: none;
 }
 
+button {
+	padding: 8px 15px;
+	background: none;
+	background-color: white;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	cursor: pointer;
+	vertical-align: bottom;
+}
+
+button:focus {
+	border: 1px solid #00c1ff;
+}
+
+button:hover, button:focus {
+	background-color: #ececec;
+	outline: none;
+}
+
+button:active {
+	background-color: #e6e6e6;
+}
+
 #md-content {
 	max-width: 50rem;;
 	margin: 0 auto;
@@ -95,7 +118,6 @@ header a:hover, header a:focus {
 	height: 100%;
 	font-size: 1.5rem;
 	padding: 1.2rem;
-	font-family: 'Playfair Display', serif;
 }
 
 .user {
@@ -111,4 +133,108 @@ header a:hover, header a:focus {
 .response.cant {
 	background-color: #ffeeee;
 }
+
+form {
+	background-color: #fafafb;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	padding: 20px;
+}
+
+.form-group {
+	padding-bottom: 20px;
+}
+
+.form-group > label {
+	font-weight: bold;
+	display: block;
+	font-family: 'Parisienne', cursive;
+	margin-bottom: 5px;
+	font-size: 1.2em;
+}
+
+.form-control {
+	width: 100%;
+	resize: none;
+	background-color: #ffffff;
+	border: 1px solid #ccc;
+	padding: 5px;
+	border-radius: 3px
+}
+
+.form-control:focus {
+	border-color: #a6cae0;
+	outline: none;
+}
+
+textarea.form-control {
+	height: 80px;
+}
+
+.radio-bttn input[type="radio"] {
+	opacity: 0;
+}
+
+.radio-bttn label {
+	position: relative;
+	display: inline-block;
+
+	/*16px width of fake checkbox + 6px distance between fake checkbox and text*/
+	padding-left: 22px;
+}
+
+.radio-bttn label::before,
+.radio-bttn label::after {
+	position: absolute;
+	content: "";
+
+	/*Needed for the line-height to take effect*/
+	display: inline-block;
+}
+
+.radio-bttn {
+	padding-bottom: 10px;
+}
+
+/*Outer box of the fake checkbox*/
+.radio-bttn label::before{
+	height: 16px;
+	width: 16px;
+
+	background-color: white;
+	border-radius: 50%;
+	border: 1px solid;
+	left: 0px;
+	top: 0;
+}
+
+/*Checkmark of the fake checkbox*/
+.radio-bttn label::after {
+	height: 5px;
+	width: 9px;
+	border-left: 2px solid;
+	border-bottom: 2px solid;
+
+	transform: rotate(-45deg);
+
+	left: 4px;
+	top: 3px;
+}
+
+/*Hide the checkmark by default*/
+.radio-bttn input[type="radio"] + label::after {
+	content: none;
+}
+
+/*Unhide on the checked state*/
+.radio-bttn input[type="radio"]:checked + label::after {
+	content: "";
+}
+
+/*Adding focus styles on the outer-box of the fake checkbox*/
+.radio-bttn input[type="radio"]:focus + label::before,
+.radio-bttn input[type="radio"]:active + label::before {
+	background-color: #fafafb;
+}
+
 

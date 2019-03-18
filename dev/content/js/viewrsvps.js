@@ -84,7 +84,8 @@
 	});
 
 	// --Setup--
-	firebase.auth().signInAnonymously();
-
+	if (!firebase.auth().currentUser) {
+		firebase.auth().signInAnonymously();
+	}
 
 })();

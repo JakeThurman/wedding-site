@@ -10,11 +10,22 @@
 		"projectId": "melissa-and-jake-wedding"
 	});
 
+	// Helper functions to get dom nodes
+	var fieldAccess = {
+		text: function (id) { return document.getElementById(id) || {}; },
+		radio: function (name) { return document.querySelector('input[name="' + name + '"]:checked') || {}; },
+	};
+
 
 	// --Get Dom nodes--
 	var form = document.getElementById("rsvp-form");
 	var countNode = document.getElementById('responses-count');
-	var fields = ["name", "note", "can_attend"];
+	var fields = {
+		"name": "text", 
+		"note": "text", 
+		"can_attend": "radio"
+	};
+
 
 	function renderWithUser(user) {
 		var ref = firebase.database().ref("users/" + user.uid + "/rsvps");
@@ -28,11 +39,13 @@
 
 			var data = {};
 
-			fields.forEach(function (id) {
-				// Record and clear the value of each field
-				data[id] = (document.getElementById(id) || {}).value;
-				(document.getElementById(id) || {}).value = "";
-			});
+			Object.keys(fields)
+				.forEach(function (id) {
+					// Record and clear the value of each field
+					var field = fieldAccess[fields[id]](id);
+					data[id] = field.value;
+					field.value = "";
+				});
 
 			// Write the response to firebase
 			ref.push(data);
@@ -69,6 +82,7 @@
 	});
 
 	// --Setup--
-	firebase.auth().signInAnonymously();
-
+	if (!firebase.auth().currentUser) {
+		firebase.auth().signInAnonymously();
+	}
 })();

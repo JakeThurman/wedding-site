@@ -3,12 +3,8 @@
 <p><span id="responses-count">No</span> response(s) sent.</p>
 
 <form id="rsvp-form">
-	<p>Please Submit an RSVP for each guest.</p>
 
-	<div class="form-group">
-		<label for="can_attend">Can You Attend (todo)?</label>
-		<input class="form-control" id="can_attend">
-	</div>
+	<div class="form-group">Please Submit an RSVP for each guest.</div>
 
 	<div class="form-group">
 		<label for="name">Name</label>
@@ -16,11 +12,24 @@
 	</div>
 
 	<div class="form-group">
+		<label>Attendance</label>
+		<div class="radio-bttn">
+			<input type="radio" name="can_attend" id="can_attend--yes">
+			<label for="can_attend--yes">Joyfully Accepts</label>
+		</div>
+		<div class="radio-bttn">
+			<input type="radio" name="can_attend" id="can_attend--no">
+			<label for="can_attend--no">Regretfully Declines</label>
+		</div>
+
+	</div>
+
+	<div class="form-group">
 		<label for="note">Note</label>
 		<textarea class="form-control" id="note"></textarea>
 	</div>
 
-	<button type="submit" class="btn btn-default">Submit</button>
+	<button type="submit">Submit</button>
 </form>
 
 <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
