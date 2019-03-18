@@ -194,7 +194,7 @@ textarea.form-control {
 	display: inline-block;
 }
 
-.radio-bttn {
+.radio-bttn:not(:last-child) {
 	padding-bottom: 10px;
 }
 
