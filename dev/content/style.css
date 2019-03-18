@@ -98,4 +98,17 @@ header a:hover, header a:focus {
 	font-family: 'Playfair Display', serif;
 }
 
+.user {
+	border: 1px solid #ccc;
+	margin-bottom: 20px;
+}
+
+.response {
+	border: 1px solid #ccc;
+	padding: 20px;
+}
+
+.response.cant {
+	background-color: #ffeeee;
+}
 

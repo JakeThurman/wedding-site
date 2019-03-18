@@ -14,7 +14,7 @@
 	// --Get Dom nodes--
 	var form = document.getElementById("rsvp-form");
 	var countNode = document.getElementById('responses-count');
-	var fields = ["name", "note"];
+	var fields = ["name", "note", "can_attend"];
 
 	function renderWithUser(user) {
 		var ref = firebase.database().ref("users/" + user.uid + "/rsvps");
@@ -65,8 +65,7 @@
 	var cleanupLast = (function () {});
 	firebase.auth().onAuthStateChanged(function(user) {
 		cleanupLast();
-		if (!user) renderWithoutUser();
-		cleanupLast = renderWithUser(user);
+		cleanupLast = user ? renderWithUser(user) : renderWithoutUser();
 	});
 
 	// --Setup--

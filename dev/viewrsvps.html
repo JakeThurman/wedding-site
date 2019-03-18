@@ -1,0 +1,32 @@
+<h2>View Responses</h2>
+
+<div id="output">
+	Responses still loading...
+</div>
+
+<script id="output-template" type="text/x-handlebars-template">
+	<div>
+		<p><b>{{count.total}}</b> total response(s) received.</p>
+		<p><b>{{count.can}}</b> can attend, <b>{{count.cannot}}</b> cannot.</p>
+
+		{{#each people}}
+			<div class="user" data-id={{uid}}>
+				{{#each rsvps}}
+					{{#if cannot_attend}}<div class="response cant" data-id={{rid}}>
+					{{else}}             <div class="response" data-id={{rid}}> {{/if}}
+						<div><b>Name</b></div>
+						<div>{{name}}</div>
+						<br/>
+						<div><b>Note</b></div>
+						<pre>{{note}}</pre>
+					</div>
+				{{/each}}
+			</div>
+		{{/each}}
+	</div>
+</script>
+
+
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.1/handlebars.min.js"></script>
+<script src="./content/js/viewrsvps.js?nocache={{buildid}}"></script>

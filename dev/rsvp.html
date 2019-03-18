@@ -1,9 +1,14 @@
 <h2>Send Response</h2>
 
-<p><span id="responses-count">0</span> response(s) sent.</p>
+<p><span id="responses-count">No</span> response(s) sent.</p>
 
 <form id="rsvp-form">
 	<p>Please Submit an RSVP for each guest.</p>
+
+	<div class="form-group">
+		<label for="can_attend">Can You Attend (todo)?</label>
+		<input class="form-control" id="can_attend">
+	</div>
 
 	<div class="form-group">
 		<label for="name">Name</label>
@@ -19,4 +24,4 @@
 </form>
 
 <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
-<script src="./content/js/rsvp.js?nocache={{id}}"></script>
+<script src="./content/js/rsvp.js?nocache={{buildid}}"></script>
