@@ -1,6 +1,6 @@
 ## Engagement Photos
 
-*Photos by Krstitin Thurman*
+*Photos by Kristin Thurman*
 
 ![Engagement Photo 1](./content/images/2D8F0F16-C35D-4718-B05A-6BD792B3F906.jpg)
 

@@ -14,6 +14,12 @@
 	var template = Handlebars.compile(src);
 	var container = document.getElementById("output");
 	
+	function countOfRsvpsWhere(people, predicate) {
+		return people.reduce(function (soFar, next) {
+				return soFar + next.rsvps.filter(predicate).length;
+		}, 0);	
+	} 
+
 	function renderWithUser(user) {
 		var ref = firebase.database().ref("users");
 
@@ -40,12 +46,12 @@
 				};
 			});
 
-			var canCount = people.reduce(function (soFar, next) {
-				return soFar + next.rsvps.filter(function (rsvp) { return !!rsvp.can_attend }).length;
-			}, 0);
-			var cannotCount = people.reduce(function (soFar, next) {
-				return soFar + next.rsvps.filter(function (rsvp) { return !rsvp.can_attend }).length;
-			}, 0);
+			var canCount = countOfRsvpsWhere(people, function (rsvp) {
+				return !rsvp.cannot_attend
+			});
+			var cannotCount = countOfRsvpsWhere(people, function (rsvp) {
+				return rsvp.cannot_attend
+			});
 
 			container.innerHTML = template({
 				count: {
