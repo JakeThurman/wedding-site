@@ -1,15 +1,6 @@
 (function () {
 	"use strict";
 
-	firebase.initializeApp({
-		"apiKey": "AIzaSyAPczq1-Zu7-bH1ikdrhUdoDsByBH8tpcE",
-		"databaseURL": "https://melissa-and-jake-wedding.firebaseio.com",
-		"storageBucket": "melissa-and-jake-wedding.appspot.com",
-		"authDomain": "melissa-and-jake-wedding.firebaseapp.com",
-		"messagingSenderId": "19750996536",
-		"projectId": "melissa-and-jake-wedding"
-	});
-
 	var src = document.getElementById("output-template").innerHTML;
 	var template = Handlebars.compile(src);
 	var container = document.getElementById("output");
@@ -26,24 +17,35 @@
 
 		ref.on('value', function(snapshot) {
 			var data = snapshot.val() || {};
-			var keys = Object.keys(data);
+			var people = Object.keys(data).map(function (uid) {
+				var person = data[uid];
 
-			var people = keys.map(function (uid) {
-				var rsvps = data[uid].rsvps || {};
-
-				return {
-					uid: uid,
-					rsvps: Object.keys(rsvps).map(function (rid) {
-						var r = rsvps[rid];
+				var rsvps = Object.keys(person.rsvps || {})
+					.map(function (rid) {
+						var r = person.rsvps[rid];
 
 						return {
 							rid: rid,
+							timestamp: new Date(r.timestamp),
 							name: r.name || "!No Name Given!",
 							note: r.note || "",
 							cannot_attend: !r.can_attend, // Fliped for easy defaulting
 						};
-					}),
-				};
+					})
+					.sort(function (a, b) {
+						return a.timestamp - b.timestamp
+					});
+
+				var timestamps = rsvps.map(function (rsvp) { return rsvp.timestamp });
+				var newestResponse = new Date(Math.max.apply(null, timestamps));
+
+				return {
+					uid: uid,
+					rsvps: rsvps,
+					newestResponse: newestResponse,
+				}
+			}).sort(function (a, b) {
+				return b.newestResponse - a.newestResponse
 			});
 
 			var canCount = countOfRsvpsWhere(people, function (rsvp) {

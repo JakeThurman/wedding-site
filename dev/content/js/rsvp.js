@@ -1,18 +1,10 @@
 (function () {
 	"use strict";
 
-	firebase.initializeApp({
-		"apiKey": "AIzaSyAPczq1-Zu7-bH1ikdrhUdoDsByBH8tpcE",
-		"databaseURL": "https://melissa-and-jake-wedding.firebaseio.com",
-		"storageBucket": "melissa-and-jake-wedding.appspot.com",
-		"authDomain": "melissa-and-jake-wedding.firebaseapp.com",
-		"messagingSenderId": "19750996536",
-		"projectId": "melissa-and-jake-wedding"
-	});
-
 	// --Get Dom nodes--
 	var form = document.getElementById("rsvp-form") || {};
-	var countNode = document.getElementById('responses-count') || {};
+	var statusNode = document.getElementById('responses-status') || {};
+	var namesNode = document.getElementById('responses-names') || {};
 	var validationContainer = document.getElementById("validation-msg") || {};
 
 	function getFields() {
@@ -39,7 +31,7 @@
 				el: f_can_attend,
 				validationMessage: f_can_attend.value ? null : "Please make an attendence selection.",
 				value: f_can_attend.value == "true",
-				reset: function () { f_can_attend.checked = false }
+				reset: function () { /*f_can_attend.checked = false*/ } // Don't clear radio bttns
 			},
 		];
 	};
@@ -48,7 +40,27 @@
 		var ref = firebase.database().ref("users/" + user.uid + "/rsvps");
 
 		ref.on('value', function(snapshot) {
-			countNode.innerText = Object.keys(snapshot.val() || {}).length || "No";
+			var rawData = snapshot.val() || {};
+			
+			statusNode.innerText = Object.keys(rawData).length > 0 
+				? "Thanks for your response!" 
+				: "No response sent.";
+			
+			// Clear last set of names
+			while (namesNode.firstChild) {
+				namesNode.removeChild(namesNode.firstChild);
+			}
+
+			// Insert new set
+			Object.keys(rawData).map(function (id) {
+				return rawData[id];
+			}).sort(function (a, b) {
+				return new Date(a.timestamp) - new Date(b.timestamp)
+			}).forEach(function (response) {
+				var el = document.createElement("li");
+				el.innerText = (response.name || "?") + (response.can_attend ? " - Accepts" : " - Declines");
+				namesNode.appendChild(el);
+			});
 		});
 
 		var onSubmit = function (e) { 
@@ -66,7 +78,9 @@
 
 			// Submit the form
 			if (!errorMessage) {
-				var data = {};
+				var data = {
+					timestamp: (new Date()).toISOString()
+				};
 
 				fields.forEach(function (f) {
 					// Record and clear the value of each field
