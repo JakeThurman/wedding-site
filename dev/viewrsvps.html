@@ -10,20 +10,27 @@
 		<p><b>{{count.can}}</b> can attend, <b>{{count.cannot}}</b> cannot.</p>
 
 		<p><i>Responses are sorted as newest first</i></p>
-		{{#each people}}
-			<div class="user" data-id={{uid}}>
-				{{#each rsvps}}
-					{{#if cannot_attend}}<div class="response cant" data-id={{rid}}>
-					{{else}}             <div class="response" data-id={{rid}}> {{/if}}
-						<div><b>Name</b></div>
-						<div>{{name}}</div>
-						<br/>
-						<div><b>Note</b></div>
-						<pre>{{note}}</pre>
-					</div>
+		<table>
+			<thead>
+				<th>Name</th>
+				<th>Can Attend</th>
+				<th>Note</th>
+			</thead>
+			<tbody>
+				{{#each people}}	
+					<tr><th colspan='3'>{{label}}</th></tr>
+
+					{{#each rsvps}}
+						{{#if cannot_attend}}<tr class="bad" data-uid={{uid}} data-rid={{rid}}>
+						{{else}}             <tr data-uid={{uid}} data-rid={{rid}}> {{/if}}
+							<td>{{name}}</td>
+							<td>{{#if cannot_attend}}N{{else}}Y{{/if}}</td>
+							<td><pre>{{note}}</pre></td>
+						</tr>
+					{{/each}}
 				{{/each}}
-			</div>
-		{{/each}}
+			</tbody>
+		</table>
 	</div>
 </script>
 

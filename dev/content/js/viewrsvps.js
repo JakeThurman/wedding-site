@@ -43,6 +43,7 @@
 					uid: uid,
 					rsvps: rsvps,
 					newestResponse: newestResponse,
+					label: "", // Label shown on gray seperator lines
 				}
 			}).sort(function (a, b) {
 				return b.newestResponse - a.newestResponse
