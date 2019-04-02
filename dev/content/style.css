@@ -245,14 +245,14 @@ thead {
 }
 
 thead th {
-	background-color: #597081;
+	background-color: #8DA1B9;
 	font-weight: bold;
 	line-height: 1.5rem;
 	color: white;
 }
 
 thead th:not(:first-child) {
-	border-left: 1px solid #536a7b;
+	border-left: 1px solid #8095ad;
 }
 
 tbody th {
