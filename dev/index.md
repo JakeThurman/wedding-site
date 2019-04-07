@@ -22,7 +22,7 @@ The ceremony will take place at **[Bethany Baptist Church](http://bethanycentral
 
 <br/>
 
-The reception to follow will be located in **The Distillery Room** at **The Waterhouse** in downton Peoria.
+The reception to follow will be located in **The Distillery Room** at **The Waterhouse** in downtown Peoria.
 
 *316 SW Washington St., Peoria, IL 61602*
 
