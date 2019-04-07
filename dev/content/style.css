@@ -56,6 +56,16 @@ h2 + p {
 	text-indent: 1.25rem;
 }
 
+
+h3 {
+	font-size: 2.5rem;
+	margin-bottom: 0;
+}
+
+h3 + p {
+	text-align: center;
+}
+
 img {
 	width: 100%;
 	height: auto;
