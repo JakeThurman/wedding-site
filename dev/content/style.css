@@ -27,6 +27,7 @@ h1, h2, h3, h4, h5, h6 {
 header {
 	background-color: #597081;
 	position: fixed;
+	opacity: 0.97;
 	top: 0;
 	width: 100%;
 	z-index: 10;
@@ -124,6 +125,7 @@ button:active {
 	height: 100%;
 	font-size: 1.5rem;
 	padding: 1.2rem;
+	padding-left: 0;
 }
 
 form {
@@ -263,6 +265,9 @@ thead th:not(:first-child) {
 
 tbody th {
 	background-color: #F0F2EF;
+	font-weight: normal;
+	font-style: italic;
+	text-align: center;
 }
 
 tr.bad {
@@ -288,4 +293,17 @@ td:not(:first-child) {
 
 table td:first-child {
 	font-weight: bold;
+}
+
+.staged .first-stage,
+.staged .second-stage {
+	transition: opacity 0.5s ease;
+	opacity: 1;
+	display: block;
+}
+
+.staged:not(.on-second-stage) .second-stage,
+.staged.on-second-stage .first-stage {
+	opacity: 0;
+	display: none;
 }

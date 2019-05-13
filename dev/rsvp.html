@@ -1,37 +1,45 @@
 <h2>Send Response</h2>
 
-<p id="responses-status">No response sent.</p>
+<p id="responses-status">No response sent from this device.</p>
 <ul id="responses-names"></ul>
 
-<form id="rsvp-form">	
-	<div class="form-group">Please Submit an RSVP for each guest.</div>
-	<div id='validation-msg' class="validation-msg"></div>
-	
-	<div class="form-group">
-		<label for="name">Name</label>
-		<input class="form-control" id="name">
-		<div class="validation-msg"></div>
-	</div>
-
-	<div class="form-group">
-		<label>Attendance</label>
-		<div class="radio-bttn">
-			<input type="radio" value="true" name="can_attend" id="can_attend--yes">
-			<label for="can_attend--yes">Joyfully Accepts</label>
+<form id="rsvp-form" class="staged on-first-stage">
+	<div class="first-stage">
+		<div class="form-group">
+			<label for="inv-name">Name On Invitation</label>
+			<input class="form-control" id="inv-name">
 		</div>
-		<div class="radio-bttn">
-			<input type="radio" value="false" name="can_attend" id="can_attend--no">
-			<label for="can_attend--no">Regretfully Declines</label>
+		<button type="submit">Find My RSVP</button>
+		<div id="front-validation-msg"></div>
+	</div>
+	<div class="second-stage">
+		<div class="form-group">Please Submit an RSVP for each guest.</div>
+		<div id='back-validation-msg' class="validation-msg"></div>
+		
+		<div class="form-group">
+			<label for="name">Guest's Name</label>
+			<input class="form-control" id="name">
 		</div>
-	</div>
 
-	<div class="form-group">
-		<label for="note">Note</label>
-		<textarea class="form-control" id="note"></textarea>
-		<div class="validation-msg"></div>
-	</div>
+		<div class="form-group">
+			<label>Attendance</label>
+			<div class="radio-bttn">
+				<input type="radio" value="true" name="can_attend" id="can_attend--yes">
+				<label for="can_attend--yes">Joyfully Accepts</label>
+			</div>
+			<div class="radio-bttn">
+				<input type="radio" value="false" name="can_attend" id="can_attend--no">
+				<label for="can_attend--no">Regretfully Declines</label>
+			</div>
+		</div>
 
-	<button type="submit">Submit</button>
+		<div class="form-group">
+			<label for="note">Note</label>
+			<textarea class="form-control" id="note"></textarea>
+		</div>
+
+		<button type="submit">Submit</button>
+	</div>
 </form>
 
 <script src="./__/firebase/3.1.0/firebase.js"></script>
