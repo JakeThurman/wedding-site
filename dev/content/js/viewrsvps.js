@@ -39,11 +39,14 @@
 				var timestamps = rsvps.map(function (rsvp) { return rsvp.timestamp });
 				var newestResponse = new Date(Math.max.apply(null, timestamps));
 
+				// This is the Label shown on gray seperator lines
+				var label = person.enteredName == person.name ? person.name : (person.name + " (typed: '" + person.enteredName + "')")
+
 				return {
 					uid: uid,
 					rsvps: rsvps,
 					newestResponse: newestResponse,
-					label: person.name, // Label shown on gray seperator lines
+					label: label, 
 				}
 			}).sort(function (a, b) {
 				return b.newestResponse - a.newestResponse

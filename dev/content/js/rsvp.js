@@ -179,6 +179,7 @@
 		function onNameMatchSuccess(matchedName, enteredName) {
 			form.classList.toggle("on-second-stage");
 			firebase.database().ref("users/" + user.uid + "/name").set(matchedName);
+			firebase.database().ref("users/" + user.uid + "/enteredName").set(enteredName);
 			document.getElementById('name').value = enteredName;
 			document.getElementById("guest-list-name").innerText = enteredName;
 
