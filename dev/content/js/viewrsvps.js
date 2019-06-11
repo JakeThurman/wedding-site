@@ -56,11 +56,22 @@
 				return rsvp.cannot_attend
 			});
 
+			var uniqueResponses = people
+				.map(function (p) {
+					return p.label 
+				})
+				.filter(function (value, index, self) { 
+					return self.indexOf(value) === index;
+				});
+
+			var duplicateCount = people.length - uniqueResponses.length
+			
 			container.innerHTML = template({
 				count: {
 					total: canCount + cannotCount,
 					can: canCount,
 					cannot: cannotCount,
+					duplicates: duplicateCount,
 				},
 				people: people,
 			});

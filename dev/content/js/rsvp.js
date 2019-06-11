@@ -6,6 +6,7 @@
 	var statusNode = document.getElementById('responses-status') || {};
 	var namesNode = document.getElementById('responses-names') || {};
 	var validationContainer = document.getElementById("back-validation-msg") || {};
+	var signOutBttn = document.getElementById('sign-out') || {};
 
 	function getFields() {
 		var f_name = document.getElementById("name") || {};
@@ -40,8 +41,22 @@
 		return name.toLowerCase().split(" ").sort().join(' ');
 	}
 
-	function namesIsSame(a, b) {
-		return strDist(normalizeName(a), normalizeName(b)) <= 1;
+	function nameDist(a, b) {
+		return strDist(normalizeName(a), normalizeName(b))
+	}
+
+	function getBestGuessInGuestList(testname) {
+		var ref = firebase.database().ref("guestlist");
+
+		return ref.once('value').then(function(snapshot) {
+			var guestlist = snapshot.val() || [];
+	
+			var sortedList = guestlist.sort(function (a, b) {
+				return nameDist(a, testname) - nameDist(b, testname);
+			});
+
+			return sortedList[0];
+		});
 	}
 
 	function findNameInGuestList(testname, callback) {
@@ -49,7 +64,7 @@
 		ref.once('value').then(function(snapshot) {
 			var guestlist = snapshot.val() || [];
 			var matches = guestlist.filter(function (name) { 
-				return namesIsSame(name, testname);
+				return nameDist(name, testname) <= 1;
 			});
 
 			if (matches.length === 1)
@@ -66,11 +81,14 @@
 		firebase.database().ref("users/" + user.uid + "/name").once('value').then(function(snapshot) {
 			if (snapshot.exists() && snapshot.val()) {
 				form.classList.toggle("on-second-stage");
-				document.getElementById("name").value = snapshot.val();
+
+				var name = snapshot.val();
+				document.getElementById("name").value = name;
+				document.getElementById("guest-list-name").innerText = name;
 			}
 		});
 
-		// 
+		// Keep the 'existing rsvps' list up to date.
 		ref.on('value', function(snapshot) {
 			var rawData = snapshot.val() || {};
 			
@@ -125,26 +143,78 @@
 				}
 			}
 			else {
-				var nameEl = document.getElementById("inv-name");
-				findNameInGuestList(nameEl.value, function (found, name) {
+				var enteredName = document.getElementById("inv-name").value;
+
+				findNameInGuestList(enteredName, function (found, matchedName) {
 					if (found) {
-						form.classList.toggle("on-second-stage");
-						firebase.database().ref("users/" + user.uid + "/name").set(name);
-						document.getElementById('name').value = nameEl.value;
+						onNameMatchSuccess(matchedName, enteredName);
 					} else {
-						alert("We couldn't find your name, make sure it's exactly as the invitation. If you continue to see this issue, please contact the couple.")
+						getBestGuessInGuestList(enteredName)
+							.then(function (guessedName) {
+								if (nameDist(guessedName, enteredName) >= 8)
+									onNameMatchFailure()
+								else
+									confirmCloseMatch(guessedName, enteredName)
+							})
 					}
 				})
 			}
 		};
 
-		// Register the listener
+		function confirmCloseMatch(guessedName, enteredName) {
+			return Swal.fire({
+				text: "Your name wasn't found as you typed it. Did you mean " + guessedName + "?",
+				type: 'question',
+				confirmButtonText: "Yes, That's Me.",
+				cancelButtonText: 'No',
+				showCancelButton: true,
+			}).then(function(result) {
+				if (result.value)
+					onNameMatchSuccess(guessedName, enteredName)
+				else
+					onNameMatchFailure()
+			})
+		}
+
+		function onNameMatchSuccess(matchedName, enteredName) {
+			form.classList.toggle("on-second-stage");
+			firebase.database().ref("users/" + user.uid + "/name").set(matchedName);
+			document.getElementById('name').value = enteredName;
+			document.getElementById("guest-list-name").innerText = enteredName;
+
+			var Toast = Swal.mixin({
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				timer: 5000
+			});
+			
+			Toast.fire({
+				type: 'success',
+				title: 'Thanks ' + enteredName + ". Now just one more step..."
+			})
+		}
+
+		function onNameMatchFailure() {
+			Swal.fire(
+				"We couldn't find your name.", 
+				"Try checking with altername forms of your name (i.e., Josh vs. Joshua). If you continue to see this issue, please contact the Jake/Melissa.",
+				"error")
+		}
+
+		function onSignOut() {
+			form.classList.toggle("on-second-stage");
+		}
+
+		// Register the listeners
 		form.addEventListener("submit", onSubmit);
+		signOutBttn.addEventListener("click", onSignOut);
 
 		// return a cleanup function
 		return function () { 
 			ref.off();
 			form.removeEventListener("submit", onSubmit);
+			signOutBttn.removeEventListener("click", onSignOut);
 		};
 	}
 
@@ -193,7 +263,7 @@
 					matrix[i][j] = matrix[i-1][j-1];
 				} else {
 					matrix[i][j] = Math.min(
-						matrix[i-1][j-1] + 1, // substitution
+						matrix[i-1][j-1] + 3, // substitution
 						Math.min(
 							matrix[i][j-1] + 1, // insertion
 							matrix[i-1][j] + 1)); // deletion

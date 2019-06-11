@@ -1,50 +1,59 @@
 <h2>Send Response</h2>
 
-<p id="responses-status">No response sent from this device.</p>
-<ul id="responses-names"></ul>
+<div id="rsvp-form" class="staged on-first-stage">
+	<div class="second-stage">Responding For: <i id="guest-list-name">???</i>. <button id="sign-out" class="text-button">Not You?</button></div>
 
-<form id="rsvp-form" class="staged on-first-stage">
-	<div class="first-stage">
-		<div class="form-group">
-			<label for="inv-name">Name On Invitation</label>
-			<input class="form-control" id="inv-name">
-		</div>
-		<button type="submit">Find My RSVP</button>
-		<div id="front-validation-msg"></div>
+	<div style="padding:10px 0">
+		<p id="responses-status">No response sent from this device.</p>
+		<ul id="responses-names"></ul>
 	</div>
-	<div class="second-stage">
-		<div class="form-group">Please Submit an RSVP for each guest.</div>
-		<div id='back-validation-msg' class="validation-msg"></div>
-		
-		<div class="form-group">
-			<label for="name">Guest's Name</label>
-			<input class="form-control" id="name">
-		</div>
 
-		<div class="form-group">
-			<label>Attendance</label>
-			<div class="radio-bttn">
-				<input type="radio" value="true" name="can_attend" id="can_attend--yes">
-				<label for="can_attend--yes">Joyfully Accepts</label>
+	<form>
+		<div class="first-stage">
+			<div class="form-group">
+				<label for="inv-name">Name On Invitation</label>
+				<input class="form-control" id="inv-name">
 			</div>
-			<div class="radio-bttn">
-				<input type="radio" value="false" name="can_attend" id="can_attend--no">
-				<label for="can_attend--no">Regretfully Declines</label>
+			<button type="submit">Find My RSVP</button>
+			<div id="front-validation-msg"></div>
+		</div>
+		<div class="second-stage">
+			<div class="form-group">Please Submit an RSVP for each guest.</div>
+			<div id='back-validation-msg' class="validation-msg"></div>
+			
+			<div class="form-group">
+				<label for="name">Guest's Name</label>
+				<input class="form-control" id="name">
 			</div>
-		</div>
 
-		<div class="form-group">
-			<label for="note">Note</label>
-			<textarea class="form-control" id="note"></textarea>
-		</div>
+			<div class="form-group">
+				<label>Attendance</label>
+				<div class="radio-bttn">
+					<input type="radio" value="true" name="can_attend" id="can_attend--yes">
+					<label for="can_attend--yes">Joyfully Accepts</label>
+				</div>
+				<div class="radio-bttn">
+					<input type="radio" value="false" name="can_attend" id="can_attend--no">
+					<label for="can_attend--no">Regretfully Declines</label>
+				</div>
+			</div>
 
-		<button type="submit">Submit</button>
-	</div>
-</form>
+			<div class="form-group">
+				<label for="note">Note</label>
+				<textarea class="form-control" id="note"></textarea>
+			</div>
+
+			<button type="submit">Submit</button>
+		</div>
+	</form>
+</div>
 
 <script src="./content/js/errorHandler.js"></script>
-<script src="./__/firebase/3.1.0/firebase.js"></script>
+<script src="./__/firebase/6.1.1/firebase-app.js"></script>
+<script src="./__/firebase/6.1.1/firebase-auth.js"></script>
+<script src="./__/firebase/6.1.1/firebase-database.js"></script>
 <script src="./__/firebase/init.js"></script>
 <script src="https://unpkg.com/core-js-bundle@3.0.1/minified.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.2.201711092/classList.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
 <script src="./content/js/rsvp.js?nocache={{buildid}}"></script>
