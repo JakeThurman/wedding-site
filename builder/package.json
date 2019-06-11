@@ -1,0 +1,12 @@
+{
+  "name": "wedding-site--builder",
+  "version": "1.0.0",
+  "description": "Builds the wedding-site project",
+  "main": "build.js",
+  "author": "@JakeThurman",
+  "license": "ISC",
+  "dependencies": {
+    "handlebars": "^4.1.2",
+    "showdown": "^1.9.0"
+  }
+}
