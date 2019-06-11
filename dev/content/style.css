@@ -285,11 +285,15 @@ tbody th {
 }
 
 tr.bad {
-	background-color: #EAD7D1;
+	background-color: #f1c8c8;
+}
+
+tr.bad td {
+	border-bottom-color: #daadad;
 }
 
 tr.bad td:not(:first-child) {
-	border-left-color: #DBCDC6;
+	border-left-color: #daadad;
 }
 
 td, th {
