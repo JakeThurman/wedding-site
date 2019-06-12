@@ -27,7 +27,6 @@ h1, #md-content h2, h3, h4, h5, h6 {
 header {
 	background-color: #597081;
 	position: fixed;
-	opacity: 0.97;
 	top: 0;
 	width: 100%;
 	z-index: 10;
