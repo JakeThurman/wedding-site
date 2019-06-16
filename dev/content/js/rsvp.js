@@ -199,7 +199,7 @@
 		function onNameMatchFailure() {
 			Swal.fire(
 				"We couldn't find your name.", 
-				"Try checking with altername forms of your name (i.e., Josh vs. Joshua). If you continue to see this issue, please contact the Jake/Melissa.",
+				"Try checking with altername forms of your name (i.e., Josh vs. Joshua). If you continue to see this issue, please contact Jake/Melissa.",
 				"error")
 		}
 
