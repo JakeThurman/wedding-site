@@ -157,6 +157,10 @@ form {
 	font-family: sans-serif;
 }
 
+.form-control[disabled] {
+	background-color: #eae6e6;
+}
+
 .form-control:focus {
 	border-color: #a6cae0;
 	outline: none;
@@ -224,6 +228,10 @@ textarea.form-control {
 /*Unhide on the checked state*/
 .radio-bttn input[type="radio"]:checked + label::after {
 	content: "";
+}
+
+.radio-bttn input[type="radio"][disabled] + label::before {
+	background-color: #eae6e6;
 }
 
 /*Adding focus styles on the outer-box of the fake checkbox*/

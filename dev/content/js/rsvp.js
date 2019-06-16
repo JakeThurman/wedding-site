@@ -1,6 +1,8 @@
 (function () {
 	"use strict";
 
+	var state = { maxGuests: 1, currGuests: 0 };
+
 	// --Get Dom nodes--
 	var form = document.getElementById("rsvp-form") || {};
 	var statusNode = document.getElementById('responses-status') || {};
@@ -11,34 +13,36 @@
 	function getFields() {
 		var f_name = document.getElementById("name") || {};
 		var f_note = document.getElementById("note") || {};
-		var f_can_attend = document.querySelector('input[name="can_attend"]:checked') || {};
+		
+		var f_can_attend_all = document.querySelectorAll('input[name="can_attend"]') || [];
+		var f_can_attend_selected = document.querySelector('input[name="can_attend"]:checked') || {};
 
 		return [
 			{
 				id: "name",
-				el: f_note,
+				els: [f_name],
 				validationMessage: f_name.value ? null : "Please include your name.",
 				value: f_name.value || "",
 				reset: function () { f_name.value = "" }
 			},
 			{
 				id: "note",
-				el: f_note,
+				els: [f_note],
 				value: f_note.value || "",
 				reset: function () { f_note.value = "" }
 			},
 			{
 				id: "can_attend",
-				el: f_can_attend,
-				validationMessage: f_can_attend.value ? null : "Please make an attendence selection.",
-				value: f_can_attend.value == "true",
+				els: f_can_attend_all,
+				validationMessage: f_can_attend_selected.value ? null : "Please make an attendence selection.",
+				value: f_can_attend_selected.value == "true",
 				reset: function () { /*f_can_attend.checked = false*/ } // Don't clear radio bttns
 			},
 		];
 	};
 
 	function normalizeName(name) {
-		return name.toLowerCase().split(" ").sort().join(' ');
+		return (name || "").toLowerCase().split(" ").sort().join(' ');
 	}
 
 	function nameDist(a, b) {
@@ -50,9 +54,9 @@
 
 		return ref.once('value').then(function(snapshot) {
 			var guestlist = snapshot.val() || [];
-	
+			
 			var sortedList = guestlist.sort(function (a, b) {
-				return nameDist(a, testname) - nameDist(b, testname);
+				return nameDist(a.name, testname) - nameDist(b.name, testname);
 			});
 
 			return sortedList[0];
@@ -63,8 +67,8 @@
 		var ref = firebase.database().ref("guestlist");
 		ref.once('value').then(function(snapshot) {
 			var guestlist = snapshot.val() || [];
-			var matches = guestlist.filter(function (name) { 
-				return nameDist(name, testname) <= 1;
+			var matches = guestlist.filter(function (guest) { 
+				return nameDist(guest.name, testname) <= 1;
 			});
 
 			if (matches.length === 1)
@@ -74,21 +78,73 @@
 		});
 	}
 
+	
+
+	function confirmCloseMatch(user, guessedName, enteredName) {
+		return Swal.fire({
+			text: "Your name wasn't found as you typed it. Did you mean " + guessedName.name + "?",
+			type: 'question',
+			confirmButtonText: "Yes, That's Me.",
+			cancelButtonText: 'No',
+			showCancelButton: true,
+		}).then(function(result) {
+			if (result.value)
+				onNameMatchSuccess(user, guessedName, enteredName)
+			else
+				onNameMatchFailure()
+		})
+	}
+
+	function onNameMatchSuccess(user, matchedName, enteredName) {
+		state.maxGuests = matchedName.maxGuests
+		form.classList.toggle("on-second-stage");
+		firebase.database().ref("users/" + user.uid + "/guestList").set(matchedName);
+		firebase.database().ref("users/" + user.uid + "/enteredName").set(enteredName);
+		document.getElementById('name').value = enteredName;
+		document.getElementById("guest-list-name").innerText = enteredName;
+
+		var Toast = Swal.mixin({
+			toast: true,
+			position: 'top-end',
+			showConfirmButton: false,
+			timer: 5000
+		});
+		
+		Toast.fire({
+			type: 'success',
+			title: 'Thanks ' + enteredName + ". Now just one more step..."
+		})
+	}
+
+	function onNameMatchFailure() {
+		Swal.fire(
+			"We couldn't find your name.", 
+			"Try checking with altername forms of your name (i.e., Josh vs. Joshua). If you continue to see this issue, please contact Jake/Melissa.",
+			"error")
+	}
+
+	function onSignOut() {
+		form.classList.toggle("on-second-stage");
+	}
+
 	function renderWithUser(user) {
 		var ref = firebase.database().ref("users/" + user.uid + "/rsvps");
 
 		// Go straight to the second stage if the user has already given us their name
-		firebase.database().ref("users/" + user.uid + "/name").once('value').then(function(snapshot) {
+		firebase.database().ref("users/" + user.uid + "/guestList").once('value').then(function(snapshot) {
 			if (snapshot.exists() && snapshot.val()) {
 				form.classList.toggle("on-second-stage");
 
-				var name = snapshot.val();
-				document.getElementById("name").value = name;
-				document.getElementById("guest-list-name").innerText = name;
+				var data = snapshot.val() || {};
+				document.getElementById("name").value = data.name;
+				document.getElementById("guest-list-name").innerText = data.name;
+				
+				state.maxGuests = data.maxGuests;
 			}
 		});
 
 		// Keep the 'existing rsvps' list up to date.
+		// TODO: how to handle "Not You?"
 		ref.on('value', function(snapshot) {
 			var rawData = snapshot.val() || {};
 			
@@ -102,11 +158,31 @@
 			}
 
 			// Insert new set
-			Object.keys(rawData).map(function (id) {
+			var rsvps = Object.keys(rawData).map(function (id) {
 				return rawData[id];
 			}).sort(function (a, b) {
 				return new Date(a.timestamp) - new Date(b.timestamp)
-			}).forEach(function (response) {
+			});
+			
+			// Think about the number of guests
+			state.currGuests = rsvps.length;
+			var atMaxGuests = state.maxGuests <= rsvps.length;
+
+			// Disable fields as needed
+			getFields().forEach(function (f) {
+				f.els.forEach(function (el) {
+					if (atMaxGuests)
+						el.setAttribute("disabled", "disabled");
+					else 
+						el.removeAttribute("disabled");
+				});
+			});
+
+			// Show/hide the max guests explainer message
+			document.getElementById('leading-msg').innerText = atMaxGuests ? "Thanks! Seems like that's everyone! If this seems incorrect, please contact Jake/Melissa." : "Please Submit an RSVP for each guest."
+
+			// Display the list of rsvps
+			rsvps.forEach(function (response) {
 				var el = document.createElement("li");
 				el.innerText = (response.name || "?") + (response.can_attend ? " - Accepts" : " - Declines");
 				namesNode.appendChild(el);
@@ -117,6 +193,12 @@
 			e.preventDefault();
 
 			if (form.classList.contains("on-second-stage")) {
+
+				// Fail if there are already the maximum number of rsvps
+				if (state.maxGuests == state.currGuests)
+					return;
+
+				// Get data from the dom
 				var fields = getFields();
 
 				var errorMessage = fields.reduce(function (result, field) {
@@ -147,65 +229,18 @@
 
 				findNameInGuestList(enteredName, function (found, matchedName) {
 					if (found) {
-						onNameMatchSuccess(matchedName, enteredName);
+						onNameMatchSuccess(user, matchedName, enteredName);
 					} else {
-						getBestGuessInGuestList(enteredName)
-							.then(function (guessedName) {
-								if (nameDist(guessedName, enteredName) >= 8)
-									onNameMatchFailure()
-								else
-									confirmCloseMatch(guessedName, enteredName)
-							})
+						getBestGuessInGuestList(enteredName).then(function (guessedName) {
+							if (nameDist(guessedName.name, enteredName) >= 8)
+								onNameMatchFailure()
+							else
+								confirmCloseMatch(user, guessedName, enteredName)
+						});
 					}
 				})
 			}
 		};
-
-		function confirmCloseMatch(guessedName, enteredName) {
-			return Swal.fire({
-				text: "Your name wasn't found as you typed it. Did you mean " + guessedName + "?",
-				type: 'question',
-				confirmButtonText: "Yes, That's Me.",
-				cancelButtonText: 'No',
-				showCancelButton: true,
-			}).then(function(result) {
-				if (result.value)
-					onNameMatchSuccess(guessedName, enteredName)
-				else
-					onNameMatchFailure()
-			})
-		}
-
-		function onNameMatchSuccess(matchedName, enteredName) {
-			form.classList.toggle("on-second-stage");
-			firebase.database().ref("users/" + user.uid + "/name").set(matchedName);
-			firebase.database().ref("users/" + user.uid + "/enteredName").set(enteredName);
-			document.getElementById('name').value = enteredName;
-			document.getElementById("guest-list-name").innerText = enteredName;
-
-			var Toast = Swal.mixin({
-				toast: true,
-				position: 'top-end',
-				showConfirmButton: false,
-				timer: 5000
-			});
-			
-			Toast.fire({
-				type: 'success',
-				title: 'Thanks ' + enteredName + ". Now just one more step..."
-			})
-		}
-
-		function onNameMatchFailure() {
-			Swal.fire(
-				"We couldn't find your name.", 
-				"Try checking with altername forms of your name (i.e., Josh vs. Joshua). If you continue to see this issue, please contact Jake/Melissa.",
-				"error")
-		}
-
-		function onSignOut() {
-			form.classList.toggle("on-second-stage");
-		}
 
 		// Register the listeners
 		form.addEventListener("submit", onSubmit);
