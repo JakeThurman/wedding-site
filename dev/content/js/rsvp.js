@@ -39,7 +39,11 @@
 				reset: function () { /*f_can_attend.checked = false*/ } // Don't clear radio bttns
 			},
 		];
-	};
+	}
+
+	function focusFirstField() {
+		getFields()[0].els[0].focus();
+	}
 
 	function normalizeName(name) {
 		return (name || "").toLowerCase().split(" ").sort().join(' ');
@@ -102,6 +106,7 @@
 		firebase.database().ref("users/" + user.uid + "/enteredName").set(enteredName);
 		document.getElementById('name').value = enteredName;
 		document.getElementById("guest-list-name").innerText = enteredName;
+		focusFirstField();
 
 		var Toast = Swal.mixin({
 			toast: true,
@@ -126,7 +131,10 @@
 	function onSignOut() {
 		firebase.auth().signOut()
 			.then(function () { return firebase.auth().signInAnonymously() })
-			.then(function () { form.classList.toggle("on-second-stage") });
+			.then(function () { 
+				form.classList.toggle("on-second-stage");
+				document.getElementById("inv-name").focus();;
+			});
 
 	}
 
@@ -137,6 +145,7 @@
 		firebase.database().ref("users/" + user.uid + "/guestInfo").once('value').then(function(snapshot) {
 			if (snapshot.exists() && snapshot.val()) {
 				form.classList.toggle("on-second-stage");
+				focusFirstField();
 
 				var data = snapshot.val() || {};
 				document.getElementById("name").value = data.name;
@@ -226,7 +235,7 @@
 
 					ref.push(data);
 
-					getFields()[0].els[0].focus();
+					focusFirstField();
 				}
 			}
 			else {
