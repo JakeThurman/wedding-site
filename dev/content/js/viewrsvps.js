@@ -7,9 +7,13 @@
 	
 	function countOfRsvpsWhere(people, predicate) {
 		return people.reduce(function (soFar, next) {
-				return soFar + next.rsvps.filter(predicate).length;
+			return soFar + next.rsvps.filter(predicate).length;
 		}, 0);
-	} 
+	}
+
+	function countOfPeopleWhere(people, predicate) {
+		return people.filter(predicate).length;
+	}
 
 	function renderWithUser(user) {
 		var ref = firebase.database().ref("users");
@@ -41,13 +45,14 @@
 
 				// This is the Label shown on gray seperator lines
 				var guestInfo = person.guestInfo || {};
-				var label = person.enteredName == guestInfo.name ? guestInfo.name : (guestInfo.name + " (typed: '" + person.enteredName + "')")
+				var label = person.enteredName === guestInfo.name ? guestInfo.name : (guestInfo.name + " (typed: '" + person.enteredName + "')")
 
 				return {
 					uid: uid,
 					rsvps: rsvps,
 					newestResponse: newestResponse,
-					label: label, 
+					label: label,
+					nameIsCorrect: person.enteredName === guestInfo.name,
 				}
 			}).sort(function (a, b) {
 				return b.newestResponse - a.newestResponse
@@ -70,12 +75,17 @@
 
 			var duplicateCount = people.length - uniqueResponses.length
 			
+			var wrongNamesCount = countOfPeopleWhere(people, function (person) {
+				return person.nameIsCorrect;
+			});
+
 			container.innerHTML = template({
 				count: {
 					total: canCount + cannotCount,
 					can: canCount,
 					cannot: cannotCount,
 					duplicates: duplicateCount,
+					wrongNames: wrongNamesCount,
 				},
 				people: people,
 			});
