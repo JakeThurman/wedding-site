@@ -203,16 +203,17 @@
 				// Get data from the dom
 				var fields = getFields();
 
-				var errorMessage = fields.reduce(function (result, field) {
-					return result || field.validationMessage;
+				var fieldWithError = fields.reduce(function (result, field) {
+					return result || (field.validationMessage && field);
 				}, null);
 
 				// Show error/replace with empty string if none.
-				validationContainer.innerText = errorMessage || "";
-				validationContainer.classList.toggle("form-group", !!errorMessage);
+				validationContainer.innerText = (fieldWithError || {}).validationMessage || "";
+				validationContainer.classList.toggle("form-group", !!fieldWithError);
 
-				// Submit the form
-				if (!errorMessage) {
+				if (fieldWithError) {
+					fieldWithError.els[0].focus();
+				} else { // Submit the form
 					var data = {
 						timestamp: (new Date()).toISOString()
 					};
@@ -224,6 +225,8 @@
 					});
 
 					ref.push(data);
+
+					getFields()[0].els[0].focus();
 				}
 			}
 			else {
