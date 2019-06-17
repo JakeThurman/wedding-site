@@ -40,7 +40,8 @@
 				var newestResponse = new Date(Math.max.apply(null, timestamps));
 
 				// This is the Label shown on gray seperator lines
-				var label = person.enteredName == person.name ? person.name : (person.name + " (typed: '" + person.enteredName + "')")
+				var guestInfo = person.guestInfo || {};
+				var label = person.enteredName == guestInfo.name ? guestInfo.name : (guestInfo.name + " (typed: '" + person.enteredName + "')")
 
 				return {
 					uid: uid,
@@ -87,7 +88,7 @@
 	}
 
 	function renderWithoutUser() {
-		container.innerText = "An Error Occured: Authorization not completed.";
+		container.innerText = "Login not completed...";
 
 		// No cleanup
 		return function () {};

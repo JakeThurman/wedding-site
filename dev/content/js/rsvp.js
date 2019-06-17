@@ -98,7 +98,7 @@
 	function onNameMatchSuccess(user, matchedName, enteredName) {
 		state.maxGuests = matchedName.maxGuests
 		form.classList.toggle("on-second-stage");
-		firebase.database().ref("users/" + user.uid + "/guestList").set(matchedName);
+		firebase.database().ref("users/" + user.uid + "/guestInfo").set(matchedName);
 		firebase.database().ref("users/" + user.uid + "/enteredName").set(enteredName);
 		document.getElementById('name').value = enteredName;
 		document.getElementById("guest-list-name").innerText = enteredName;
@@ -124,14 +124,17 @@
 	}
 
 	function onSignOut() {
-		form.classList.toggle("on-second-stage");
+		firebase.auth().signOut()
+			.then(function () { return firebase.auth().signInAnonymously() })
+			.then(function () { form.classList.toggle("on-second-stage") });
+
 	}
 
 	function renderWithUser(user) {
 		var ref = firebase.database().ref("users/" + user.uid + "/rsvps");
 
 		// Go straight to the second stage if the user has already given us their name
-		firebase.database().ref("users/" + user.uid + "/guestList").once('value').then(function(snapshot) {
+		firebase.database().ref("users/" + user.uid + "/guestInfo").once('value').then(function(snapshot) {
 			if (snapshot.exists() && snapshot.val()) {
 				form.classList.toggle("on-second-stage");
 
@@ -144,7 +147,6 @@
 		});
 
 		// Keep the 'existing rsvps' list up to date.
-		// TODO: how to handle "Not You?"
 		ref.on('value', function(snapshot) {
 			var rawData = snapshot.val() || {};
 			
@@ -265,7 +267,6 @@
 			form.removeEventListener("submit", onSubmit);
 		};
 	}
-
 
 	// --Register to rerender when auth changes---
 	var cleanupLast = (function () {});

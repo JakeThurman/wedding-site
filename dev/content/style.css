@@ -284,11 +284,9 @@ thead th:not(:first-child) {
 }
 
 tbody th {
-	padding-top: 30px;
 	background-color: #F0F2EF;
 	font-weight: normal;
 	font-style: italic;
-	text-align: center;
 }
 
 tr.bad {
@@ -318,6 +316,7 @@ td:not(:first-child) {
 
 table td:first-child {
 	font-weight: bold;
+	padding-left: 25px;
 }
 
 .staged .first-stage,
