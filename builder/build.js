@@ -31,6 +31,7 @@ const pagesToSettings = {
 	"engagementphotos.html": getSettingsForBody(htmlOfMD("../dev/engagementphotos.md")),
 	"rsvp.html": getSettingsForBody(contentUsingBuildId('../dev/rsvp.html')),
 	"viewrsvps.html": getSettingsForBody(contentUsingBuildId('../dev/viewrsvps.html')),
+	"registry.html": getSettingsForBody(contentOf("../dev/registry.html"))
 };
 
 // Render each of the pages to an appropriate file
