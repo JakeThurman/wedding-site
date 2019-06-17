@@ -6,10 +6,22 @@
 
 <script id="output-template" type="text/x-handlebars-template">
 	<div>
-		<p><b>{{count.total}}</b> total response(s) received.</p>
-		<p><b>{{count.can}}</b> can attend, <b>{{count.cannot}}</b> cannot.</p>
-		<p><b>{{count.duplicates}}</b> potentially duplicate response(s).</p>
-		<p><b>{{count.wrongNames}}</b> potentially incorrect name(s).</p>
+		<div style="display:grid;grid-template-columns:50% auto">
+			<div>
+				<p><b>{{count.total}}</b> total response(s) received:</p>
+				<ul>
+					<li><b>{{count.can}}</b> can attend</li>
+					<li><b>{{count.cannot}}</b> cannot</li>
+				</ul>
+			</div>
+			<div>
+				<p>Potential Issues:</p>
+				<ul>
+					<li><b>{{count.duplicates}}</b> duplicated response(s).</li>
+					<li><b>{{count.wrongNames}}</b> incorrect name(s).</li>
+				</ul>
+			</div>
+		</div>
 		<br/>
 		<p><i>Responses are sorted as newest first</i></p>
 		<table>
@@ -20,7 +32,7 @@
 			</thead>
 			<tbody>
 				{{#each people}}	
-					<tr><th colspan='3'>{{label}}</th></tr>
+					<tr><th colspan='3'>{{label}}:</th></tr>
 
 					{{#each rsvps}}
 						{{#if cannot_attend}}<tr class="bad" data-uid={{uid}} data-rid={{rid}}>
