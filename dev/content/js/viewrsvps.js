@@ -33,6 +33,7 @@
 							timestamp: new Date(r.timestamp),
 							name: r.name || "!No Name Given!",
 							note: r.note || "",
+							meal: r.meal || "Unknown",
 							cannot_attend: !r.can_attend, // Fliped for easy defaulting
 						};
 					})

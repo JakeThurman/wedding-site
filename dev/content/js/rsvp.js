@@ -17,6 +17,9 @@
 		var f_can_attend_all = document.querySelectorAll('input[name="can_attend"]') || [];
 		var f_can_attend_selected = document.querySelector('input[name="can_attend"]:checked') || {};
 
+		var f_meal_all = document.querySelectorAll('input[name="meal"]') || [];
+		var f_meal_selected = document.querySelector('input[name="meal"]:checked') || {};
+
 		return [
 			{
 				id: "name",
@@ -26,17 +29,24 @@
 				reset: function () { f_name.value = "" }
 			},
 			{
-				id: "note",
-				els: [f_note],
-				value: f_note.value || "",
-				reset: function () { f_note.value = "" }
-			},
-			{
 				id: "can_attend",
 				els: f_can_attend_all,
 				validationMessage: f_can_attend_selected.value ? null : "Please make an attendence selection.",
 				value: f_can_attend_selected.value == "true",
-				reset: function () { /*f_can_attend.checked = false*/ } // Don't clear radio bttns
+				reset: function () {} // Don't clear these radio bttns!
+			},
+			{
+				id: "meal",
+				els: f_meal_all,
+				validationMessage: f_meal_selected.value ? null : "Please make a meal selection.",
+				value: f_meal_selected.value || "",
+				reset: function () { f_meal_all.forEach(function (el) { el.checked = false }) }
+			},
+			{
+				id: "note",
+				els: [f_note],
+				value: f_note.value || "",
+				reset: function () { f_note.value = "" }
 			},
 		];
 	}
