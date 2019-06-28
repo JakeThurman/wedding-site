@@ -147,7 +147,7 @@ button:active {
 }
 
 #md-content {
-	max-width: 50rem;;
+	max-width: 50rem;
 	margin: 0 auto;
 	padding: 6.5rem 2rem 10rem 2rem;
 }
@@ -356,4 +356,42 @@ table td:first-child {
 .staged.on-second-stage .first-stage {
 	opacity: 0;
 	display: none;
+}
+
+/* Registry page styles */
+.registry-container li {
+	list-style: none;
+	border: 1px solid #ccc;
+	flex: 1;
+	margin: 10px;
+	display: flex;
+	justify-content: flex-end;
+	flex-direction: column;
+}
+
+.registry-container a {
+	padding: 20px;
+	display: block;
+	text-align: center;
+	flex-grow: 1;	
+}
+
+.registry-container img {
+	box-shadow: none;
+    display: block;
+    margin: 0 auto 15px auto;
+    max-width: 200px;
+}
+
+.registry-container {
+	display: flex;
+	flex-wrap: wrap;
+    flex-direction: row;
+	padding: 0;
+}
+
+@media (max-width: 800px) {
+	.registry-container {
+		flex-direction: column;
+	}
 }
