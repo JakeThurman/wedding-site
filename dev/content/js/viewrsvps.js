@@ -82,16 +82,19 @@
 
 			function mealCount(mealName) { 
 				return countOfRsvpsWhere(people, function (person) {
-					return person.meal.toLowerCase() === mealName;
+					return !person.cannot_attend && person.meal.toLowerCase() === mealName;
 				});
 			}
 
 			var chickenEaterCount = mealCount("chicken");
 			var beefEaterCount = mealCount("beef");
 			var porkEaterCount = mealCount("pork");
+
+			// Check for invalid meals (except for people that just can't come!)
 			var invalidEaterCout = countOfRsvpsWhere(people, function (person) {
 				var meal = person.meal.toLowerCase();
-				return meal !== "chicken" 
+				return !person.cannot_attend
+					&& meal !== "chicken" 
 					&& meal !== "beef"
 					&& meal !== "pork"
 			});
