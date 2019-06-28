@@ -19,7 +19,7 @@ p {
 }
 
 h1, #md-content h2, h3, h4, h5, h6 {
-	font-family: 'Parisienne', cursive;
+	font-family: 'Parisienne', serif;
 	text-align: center;
 	color: #2f2f2f;
 }
@@ -167,7 +167,7 @@ form {
 .form-group > label {
 	font-weight: bold;
 	display: block;
-	font-family: 'Parisienne', cursive;
+	font-family: 'Parisienne', serif;
 	margin-bottom: 5px;
 	font-size: 1.2em;
 }
