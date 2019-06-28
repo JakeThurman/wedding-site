@@ -77,8 +77,25 @@
 			var duplicateCount = people.length - uniqueResponses.length
 			
 			var wrongNamesCount = countOfPeopleWhere(people, function (person) {
-				return person.nameIsCorrect;
+				return !person.nameIsCorrect;
 			});
+
+			function mealCount(mealName) { 
+				return countOfRsvpsWhere(people, function (person) {
+					return person.meal.toLowerCase() === mealName;
+				});
+			}
+
+			var chickenEaterCount = mealCount("chicken");
+			var beefEaterCount = mealCount("beef");
+			var porkEaterCount = mealCount("pork");
+			var invalidEaterCout = countOfRsvpsWhere(people, function (person) {
+				var meal = person.meal.toLowerCase();
+				return meal !== "chicken" 
+					&& meal !== "beef"
+					&& meal !== "pork"
+			});
+			
 
 			container.innerHTML = template({
 				count: {
@@ -87,6 +104,12 @@
 					cannot: cannotCount,
 					duplicates: duplicateCount,
 					wrongNames: wrongNamesCount,
+					meal: {
+						chicken: chickenEaterCount,
+						beef: beefEaterCount,
+						pork: porkEaterCount,
+						invalid: invalidEaterCout,
+					},
 				},
 				people: people,
 			});

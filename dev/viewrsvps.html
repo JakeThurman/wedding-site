@@ -6,7 +6,7 @@
 
 <script id="output-template" type="text/x-handlebars-template">
 	<div>
-		<div style="display:grid;grid-template-columns:50% auto">
+		<div class="rsvp-stats">
 			<div>
 				<p><b>{{count.total}}</b> total response(s) received:</p>
 				<ul>
@@ -15,10 +15,19 @@
 				</ul>
 			</div>
 			<div>
+				<p>Entr&#233;e Choices:</p>
+				<ul>
+					<li><b>{{count.meal.chicken}}</b> said <i>Chicken</i></li>
+					<li><b>{{count.meal.beef}}</b> said <i>Beef</i></li>
+					<li><b>{{count.meal.pork}}</b> said <i>Pork</i></li>
+				</ul>
+			</div>
+			<div>
 				<p>Potential Issues:</p>
 				<ul>
 					<li><b>{{count.duplicates}}</b> duplicated response(s).</li>
 					<li><b>{{count.wrongNames}}</b> incorrect name(s).</li>
+					<li><b>{{count.meal.invalid}}</b> invalid meal choice.</li>
 				</ul>
 			</div>
 		</div>
@@ -28,17 +37,19 @@
 			<thead>
 				<th>Name</th>
 				<th>Can Attend</th>
+				<th>Entr&#233;e</th>
 				<th>Note</th>
 			</thead>
 			<tbody>
 				{{#each people}}	
-					<tr><th colspan='3'>{{label}}:</th></tr>
+					<tr><th colspan='4'>{{label}}:</th></tr>
 
 					{{#each rsvps}}
 						{{#if cannot_attend}}<tr class="bad" data-uid={{uid}} data-rid={{rid}}>
 						{{else}}             <tr data-uid={{uid}} data-rid={{rid}}> {{/if}}
 							<td>{{name}}</td>
 							<td>{{#if cannot_attend}}N{{else}}Y{{/if}}</td>
+							<td>{{meal}}</td>
 							<td><pre>{{note}}</pre></td>
 						</tr>
 					{{/each}}

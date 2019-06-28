@@ -397,3 +397,13 @@ table td:first-child {
 		flex-direction: column;
 	}
 }
+
+/*view rsvp styles*/
+.rsvp-stats {
+	display: flex;
+	flex-direction: row;
+}
+.rsvp-stats > * {
+	padding: 0 5px;
+	flex: 1;
+}
