@@ -375,7 +375,6 @@ table td:first-child {
 	padding: 20px;
 	display: block;
 	text-align: center;
-	flex-grow: 1;	
 }
 
 .registry-container img {
