@@ -26,14 +26,14 @@ const getSettingsForBody = body => ({ body, buildid });
 const generateFromTemplate = htmlWriter(templateOf("../dev/template.html"));
 
 // Pages to render
-const pagesToSettings = {
-	"index.html": getSettingsForBody(htmlOfMD("../dev/index.md")),
-	"engagementphotos.html": getSettingsForBody(htmlOfMD("../dev/engagementphotos.md")),
-	"rsvp.html": getSettingsForBody(contentUsingBuildId('../dev/rsvp.html')),
-	"viewrsvps.html": getSettingsForBody(contentUsingBuildId('../dev/viewrsvps.html')),
-	"registry.html": getSettingsForBody(contentOf("../dev/registry.html"))
+const pageContent = {
+	"index.html": htmlOfMD("../dev/index.md"),
+	"engagementphotos.html": htmlOfMD("../dev/engagementphotos.md"),
+	"rsvp.html": contentUsingBuildId('../dev/rsvp.html'),
+	"viewrsvps.html": contentUsingBuildId('../dev/viewrsvps.html'),
+	"registry.html": contentOf("../dev/registry.html")
 };
 
 // Render each of the pages to an appropriate file
-Object.keys(pagesToSettings).forEach(name => 
-	generateFromTemplate(name, pagesToSettings[name]));
+Object.keys(pageContent).forEach(name => 
+	generateFromTemplate(name, getSettingsForBody(pageContent[name])));

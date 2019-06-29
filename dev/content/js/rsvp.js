@@ -51,8 +51,22 @@
 		];
 	}
 
+	function getField(id) {
+		return getFields()
+			.filter(function (f) { return f.id === id })[0];
+	}
+
 	function focusFirstField() {
 		getFields()[0].els[0].focus();
+	}
+
+	function setDisabled(els, disable) {
+		els.forEach(function (el) {
+			if (disable)
+				el.setAttribute("disabled", "disabled");
+			else 
+				el.removeAttribute("disabled");
+		});
 	}
 
 	function normalizeName(name) {
@@ -143,7 +157,8 @@
 			.then(function () { return firebase.auth().signInAnonymously() })
 			.then(function () { 
 				form.classList.toggle("on-second-stage");
-				document.getElementById("inv-name").focus();;
+				getFields().forEach(function (f) { f.reset(); });
+				document.getElementById("inv-name").focus();
 			});
 
 	}
@@ -191,12 +206,7 @@
 
 			// Disable fields as needed
 			getFields().forEach(function (f) {
-				f.els.forEach(function (el) {
-					if (atMaxGuests)
-						el.setAttribute("disabled", "disabled");
-					else 
-						el.removeAttribute("disabled");
-				});
+				setDisabled(f.els, atMaxGuests);
 			});
 
 			// Show/hide the max guests explainer message
@@ -210,7 +220,7 @@
 			});
 		});
 
-		var onSubmit = function (e) {
+		function onSubmit(e) {
 			e.preventDefault();
 
 			if (form.classList.contains("on-second-stage")) {
@@ -266,15 +276,27 @@
 			}
 		};
 
+		function onAttendanceChange() {
+			var canAttend = getField("can_attend").value;
+			var mealEls = getField("meal").els;
+			
+			// If you can't go, you don't get to pick a meal
+			setDisabled(mealEls, !canAttend);
+		}
+
 		// Register the listeners
 		form.addEventListener("submit", onSubmit);
 		signOutBttn.addEventListener("click", onSignOut);
+
+		var attendenceEls = getField("can_attend").els;
+		attendenceEls.forEach(function (el) { el.addEventListener("change", onAttendanceChange) })
 
 		// return a cleanup function
 		return function () { 
 			ref.off();
 			form.removeEventListener("submit", onSubmit);
 			signOutBttn.removeEventListener("click", onSignOut);
+			attendenceEls.forEach(function (el) { el.removeEventListener("change", onAttendanceChange) })
 		};
 	}
 
