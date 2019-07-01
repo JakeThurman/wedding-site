@@ -46,14 +46,15 @@
 
 				// This is the Label shown on gray seperator lines
 				var guestInfo = person.guestInfo || {};
-				var label = person.enteredName === guestInfo.name ? guestInfo.name : (guestInfo.name + " (typed: '" + person.enteredName + "')")
+				var nameIsCorrect = guestInfo.enteredName === guestInfo.name;
+				var label = nameIsCorrect ? guestInfo.name : (guestInfo.name + " (typed: '" + guestInfo.enteredName + "')");
 
 				return {
 					uid: uid,
 					rsvps: rsvps,
 					newestResponse: newestResponse,
 					label: label,
-					nameIsCorrect: person.enteredName === guestInfo.name,
+					nameIsCorrect: nameIsCorrect,
 				}
 			}).sort(function (a, b) {
 				return b.newestResponse - a.newestResponse

@@ -139,10 +139,13 @@
 		document.getElementById("guest-list-name").innerText = enteredName + getGuestsText(state.maxGuests);
 
 		firebase.auth().signInAnonymously().then(function () {
-			// Store user info.
+			// Store user info in the DB for later
 			var user = firebase.auth().currentUser || {};
-			firebase.database().ref("users/" + user.uid + "/guestInfo").set(matchedName);
-			firebase.database().ref("users/" + user.uid + "/enteredName").set(enteredName);
+			firebase.database().ref("users/" + user.uid + "/guestInfo").set({
+				name: matchedName.name,
+				maxGuests: matchedName.maxGuests,
+				enteredName: enteredName,
+			});
 		});
 
 		Swal.mixin({
@@ -178,10 +181,15 @@
 				focusFirstField();
 
 				var data = snapshot.val() || {};
-				document.getElementById("name").value = data.name;
-				document.getElementById("guest-list-name").innerText = data.name + getGuestsText(state.maxGuests);
 				
 				state.maxGuests = data.maxGuests;
+
+				// Fill in, but don't overwrite the name data
+				var nameEl = getField("name").els[0];
+				if (!nameEl.value) {
+					nameEl.value = data.enteredName;
+					document.getElementById("guest-list-name").innerText = data.enteredName + getGuestsText(state.maxGuests);
+				}
 			}
 		});
 
