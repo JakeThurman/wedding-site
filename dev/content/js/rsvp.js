@@ -181,7 +181,7 @@
 				focusFirstField();
 
 				var data = snapshot.val() || {};
-				
+
 				state.maxGuests = data.maxGuests;
 
 				// Fill in, but don't overwrite the name data
