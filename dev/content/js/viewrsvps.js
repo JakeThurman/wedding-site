@@ -15,133 +15,106 @@
 		return people.filter(predicate).length;
 	}
 
-	function renderWithUser(user) {
-		var ref = firebase.database().ref("users");
+	var ref = firebase.database().ref("users");
 
+	ref.on('value', function(snapshot) {
+		var data = snapshot.val() || {};
+		var people = Object.keys(data).map(function (uid) {
+			var person = data[uid];
 
-		ref.on('value', function(snapshot) {
-			var data = snapshot.val() || {};
-			var people = Object.keys(data).map(function (uid) {
-				var person = data[uid];
+			var rsvps = Object.keys(person.rsvps || {})
+				.map(function (rid) {
+					var r = person.rsvps[rid];
 
-				var rsvps = Object.keys(person.rsvps || {})
-					.map(function (rid) {
-						var r = person.rsvps[rid];
-
-						return {
-							rid: rid,
-							timestamp: new Date(r.timestamp),
-							name: r.name || "!No Name Given!",
-							note: r.note || "",
-							meal: r.meal || "Unknown",
-							cannot_attend: !r.can_attend, // Fliped for easy defaulting
-						};
-					})
-					.sort(function (a, b) {
-						return a.timestamp - b.timestamp
-					});
-
-				var timestamps = rsvps.map(function (rsvp) { return rsvp.timestamp });
-				var newestResponse = new Date(Math.max.apply(null, timestamps));
-
-				// This is the Label shown on gray seperator lines
-				var guestInfo = person.guestInfo || {};
-				var nameIsCorrect = guestInfo.enteredName === guestInfo.name;
-				var label = nameIsCorrect ? guestInfo.name : (guestInfo.name + " (typed: '" + guestInfo.enteredName + "')");
-
-				return {
-					uid: uid,
-					rsvps: rsvps,
-					newestResponse: newestResponse,
-					label: label,
-					nameIsCorrect: nameIsCorrect,
-				}
-			}).sort(function (a, b) {
-				return b.newestResponse - a.newestResponse
-			});
-
-			var canCount = countOfRsvpsWhere(people, function (rsvp) {
-				return !rsvp.cannot_attend
-			});
-			var cannotCount = countOfRsvpsWhere(people, function (rsvp) {
-				return rsvp.cannot_attend
-			});
-
-			var uniqueResponses = people
-				.map(function (p) {
-					return p.label 
+					return {
+						rid: rid,
+						timestamp: new Date(r.timestamp),
+						name: r.name || "!No Name Given!",
+						note: r.note || "",
+						meal: r.meal || "Unknown",
+						cannot_attend: !r.can_attend, // Fliped for easy defaulting
+					};
 				})
-				.filter(function (value, index, self) { 
-					return self.indexOf(value) === index;
+				.sort(function (a, b) {
+					return a.timestamp - b.timestamp
 				});
 
-			var duplicateCount = people.length - uniqueResponses.length
-			
-			var wrongNamesCount = countOfPeopleWhere(people, function (person) {
-				return !person.nameIsCorrect;
-			});
+			var timestamps = rsvps.map(function (rsvp) { return rsvp.timestamp });
+			var newestResponse = new Date(Math.max.apply(null, timestamps));
 
-			function mealCount(mealName) { 
-				return countOfRsvpsWhere(people, function (person) {
-					return !person.cannot_attend && person.meal.toLowerCase() === mealName;
-				});
+			// This is the Label shown on gray seperator lines
+			var guestInfo = person.guestInfo || {};
+			var nameIsCorrect = guestInfo.enteredName === guestInfo.name;
+			var label = nameIsCorrect ? guestInfo.name : (guestInfo.name + " (typed: '" + guestInfo.enteredName + "')");
+
+			return {
+				uid: uid,
+				rsvps: rsvps,
+				newestResponse: newestResponse,
+				label: label,
+				nameIsCorrect: nameIsCorrect,
 			}
-
-			var chickenEaterCount = mealCount("chicken");
-			var beefEaterCount = mealCount("beef");
-			var porkEaterCount = mealCount("pork");
-
-			// Check for invalid meals (except for people that just can't come!)
-			var invalidEaterCout = countOfRsvpsWhere(people, function (person) {
-				var meal = person.meal.toLowerCase();
-				return !person.cannot_attend
-					&& meal !== "chicken" 
-					&& meal !== "beef"
-					&& meal !== "pork"
-			});
-			
-
-			container.innerHTML = template({
-				count: {
-					total: canCount + cannotCount,
-					can: canCount,
-					cannot: cannotCount,
-					duplicates: duplicateCount,
-					wrongNames: wrongNamesCount,
-					meal: {
-						chicken: chickenEaterCount,
-						beef: beefEaterCount,
-						pork: porkEaterCount,
-						invalid: invalidEaterCout,
-					},
-				},
-				people: people,
-			});
+		}).sort(function (a, b) {
+			return b.newestResponse - a.newestResponse
 		});
 
-		// return a cleanup function
-		return function () { 
-			ref.off();
-		};
-	}
+		var canCount = countOfRsvpsWhere(people, function (rsvp) {
+			return !rsvp.cannot_attend
+		});
+		var cannotCount = countOfRsvpsWhere(people, function (rsvp) {
+			return rsvp.cannot_attend
+		});
 
-	function renderWithoutUser() {
-		container.innerText = "Login not completed...";
+		var uniqueResponses = people
+			.map(function (p) {
+				return p.label 
+			})
+			.filter(function (value, index, self) { 
+				return self.indexOf(value) === index;
+			});
 
-		// No cleanup
-		return function () {};
-	}
+		var duplicateCount = people.length - uniqueResponses.length
+		
+		var wrongNamesCount = countOfPeopleWhere(people, function (person) {
+			return !person.nameIsCorrect;
+		});
 
-	// --Register to rerender when auth changes---
-	var cleanupLast = (function () {});
-	firebase.auth().onAuthStateChanged(function(user) {
-		cleanupLast();
-		cleanupLast = user ? renderWithUser(user) : renderWithoutUser();
-
-		// Oh: We didn't log in yet!
-		if (!user) {
-			firebase.auth().signInAnonymously();
+		function mealCount(mealName) { 
+			return countOfRsvpsWhere(people, function (person) {
+				return !person.cannot_attend && person.meal.toLowerCase() === mealName;
+			});
 		}
+
+		var chickenEaterCount = mealCount("chicken");
+		var beefEaterCount = mealCount("beef");
+		var porkEaterCount = mealCount("pork");
+
+		// Check for invalid meals (except for people that just can't come!)
+		var invalidEaterCout = countOfRsvpsWhere(people, function (person) {
+			var meal = person.meal.toLowerCase();
+			return !person.cannot_attend
+				&& meal !== "chicken" 
+				&& meal !== "beef"
+				&& meal !== "pork"
+		});
+		
+
+		container.innerHTML = template({
+			count: {
+				total: canCount + cannotCount,
+				can: canCount,
+				cannot: cannotCount,
+				duplicates: duplicateCount,
+				wrongNames: wrongNamesCount,
+				meal: {
+					chicken: chickenEaterCount,
+					beef: beefEaterCount,
+					pork: porkEaterCount,
+					invalid: invalidEaterCout,
+				},
+			},
+			people: people,
+		});
 	});
 
 })();
