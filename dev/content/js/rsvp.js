@@ -1,6 +1,7 @@
 (function () {
 	"use strict";
 
+	var MAX_NAME_DIST = 8;
 	var state = { maxGuests: 1, currGuests: 0 };
 
 	// --Get Dom nodes--
@@ -20,6 +21,8 @@
 		var f_meal_all = document.querySelectorAll('input[name="meal"]') || [];
 		var f_meal_selected = document.querySelector('input[name="meal"]:checked') || {};
 
+		var canAttend = f_can_attend_selected.value == "true";
+
 		return [
 			{
 				id: "name",
@@ -32,13 +35,13 @@
 				id: "can_attend",
 				els: f_can_attend_all,
 				validationMessage: f_can_attend_selected.value ? null : "Please make an attendence selection.",
-				value: f_can_attend_selected.value == "true",
+				value: canAttend,
 				reset: function () {} // Don't clear these radio bttns!
 			},
 			{
 				id: "meal",
 				els: f_meal_all,
-				validationMessage: f_meal_selected.value ? null : "Please make a meal selection.",
+				validationMessage: canAttend && f_meal_selected.value ? null : "Please make a meal selection.",
 				value: f_meal_selected.value || "",
 				reset: function () { f_meal_all.forEach(function (el) { el.checked = false }) }
 			},
@@ -108,7 +111,7 @@
 
 	
 
-	function confirmCloseMatch(user, guessedName, enteredName) {
+	function confirmCloseMatch(guessedName, enteredName) {
 		return Swal.fire({
 			text: "Your name wasn't found as you typed it. Did you mean " + guessedName.name + "?",
 			type: 'question',
@@ -117,32 +120,40 @@
 			showCancelButton: true,
 		}).then(function(result) {
 			if (result.value)
-				onNameMatchSuccess(user, guessedName, enteredName)
+				onNameMatchSuccess(guessedName, enteredName)
 			else
 				onNameMatchFailure()
 		})
 	}
 
-	function onNameMatchSuccess(user, matchedName, enteredName) {
-		state.maxGuests = matchedName.maxGuests
-		form.classList.toggle("on-second-stage");
-		firebase.database().ref("users/" + user.uid + "/guestInfo").set(matchedName);
-		firebase.database().ref("users/" + user.uid + "/enteredName").set(enteredName);
-		document.getElementById('name').value = enteredName;
-		document.getElementById("guest-list-name").innerText = enteredName;
-		focusFirstField();
+	function getGuestsText(n) {
+		if (n === 1) return "";
+		if (n === 2) return " and guest";
+		return " and guests";
+	}
 
-		var Toast = Swal.mixin({
+	function onNameMatchSuccess(matchedName, enteredName) {
+		state.maxGuests = matchedName.maxGuests;
+		
+		document.getElementById('name').value = enteredName;
+		document.getElementById("guest-list-name").innerText = enteredName + getGuestsText(state.maxGuests);
+
+		firebase.auth().signInAnonymously().then(function () {
+			// Store user info.
+			var user = firebase.auth().currentUser || {};
+			firebase.database().ref("users/" + user.uid + "/guestInfo").set(matchedName);
+			firebase.database().ref("users/" + user.uid + "/enteredName").set(enteredName);
+		});
+
+		Swal.mixin({
 			toast: true,
 			position: 'top-end',
 			showConfirmButton: false,
 			timer: 5000
-		});
-		
-		Toast.fire({
+		}).fire({
 			type: 'success',
 			title: 'Thanks ' + enteredName + ". Now just one more step..."
-		})
+		});
 	}
 
 	function onNameMatchFailure() {
@@ -153,28 +164,22 @@
 	}
 
 	function onSignOut() {
-		firebase.auth().signOut()
-			.then(function () { return firebase.auth().signInAnonymously() })
-			.then(function () { 
-				form.classList.toggle("on-second-stage");
-				getFields().forEach(function (f) { f.reset(); });
-				document.getElementById("inv-name").focus();
-			});
-
+		firebase.auth().signOut().then(function () {
+			getFields().forEach(function (f) { f.reset(); });
+		});
 	}
 
 	function renderWithUser(user) {
 		var ref = firebase.database().ref("users/" + user.uid + "/rsvps");
 
-		// Go straight to the second stage if the user has already given us their name
+		// Fill in the current values if the user has already given us their name
 		firebase.database().ref("users/" + user.uid + "/guestInfo").once('value').then(function(snapshot) {
 			if (snapshot.exists() && snapshot.val()) {
-				form.classList.toggle("on-second-stage");
 				focusFirstField();
 
 				var data = snapshot.val() || {};
 				document.getElementById("name").value = data.name;
-				document.getElementById("guest-list-name").innerText = data.name;
+				document.getElementById("guest-list-name").innerText = data.name + getGuestsText(state.maxGuests);
 				
 				state.maxGuests = data.maxGuests;
 			}
@@ -186,7 +191,7 @@
 			
 			statusNode.innerText = Object.keys(rawData).length > 0 
 				? "Thanks for your response!" 
-				: "No response sent from this device.";
+				: "";
 			
 			// Clear last set of names
 			while (namesNode.firstChild) {
@@ -210,7 +215,9 @@
 			});
 
 			// Show/hide the max guests explainer message
-			document.getElementById('leading-msg').innerText = atMaxGuests ? "Thanks! Seems like that's everyone! If this seems incorrect, please contact Jake/Melissa." : "Please Submit an RSVP for each guest."
+			document.getElementById('leading-msg').innerText = atMaxGuests 
+				? ("Thanks for your response!" + (state.maxGuests > 1 ? " Seems like that's everyone!" : ""))
+				: "Please Submit an RSVP for each guest."
 
 			// Display the list of rsvps
 			rsvps.forEach(function (response) {
@@ -223,56 +230,37 @@
 		function onSubmit(e) {
 			e.preventDefault();
 
-			if (form.classList.contains("on-second-stage")) {
+			// Fail if there are already the maximum number of rsvps
+			if (state.maxGuests == state.currGuests)
+				return;
 
-				// Fail if there are already the maximum number of rsvps
-				if (state.maxGuests == state.currGuests)
-					return;
+			// Get data from the dom
+			var fields = getFields();
 
-				// Get data from the dom
-				var fields = getFields();
+			var fieldWithError = fields.reduce(function (result, field) {
+				return result || (field.validationMessage && field);
+			}, null);
 
-				var fieldWithError = fields.reduce(function (result, field) {
-					return result || (field.validationMessage && field);
-				}, null);
+			// Show error/replace with empty string if none.
+			validationContainer.innerText = (fieldWithError || {}).validationMessage || "";
+			validationContainer.classList.toggle("form-group", !!fieldWithError);
 
-				// Show error/replace with empty string if none.
-				validationContainer.innerText = (fieldWithError || {}).validationMessage || "";
-				validationContainer.classList.toggle("form-group", !!fieldWithError);
+			if (fieldWithError) {
+				fieldWithError.els[0].focus();
+			} else { // Submit the form
+				var data = {
+					timestamp: (new Date()).toISOString()
+				};
 
-				if (fieldWithError) {
-					fieldWithError.els[0].focus();
-				} else { // Submit the form
-					var data = {
-						timestamp: (new Date()).toISOString()
-					};
+				fields.forEach(function (f) {
+					// Record and clear the value of each field
+					data[f.id] = f.value;
+					f.reset();
+				});
 
-					fields.forEach(function (f) {
-						// Record and clear the value of each field
-						data[f.id] = f.value;
-						f.reset();
-					});
+				ref.push(data);
 
-					ref.push(data);
-
-					focusFirstField();
-				}
-			}
-			else {
-				var enteredName = document.getElementById("inv-name").value;
-
-				findNameInGuestList(enteredName, function (found, matchedName) {
-					if (found) {
-						onNameMatchSuccess(user, matchedName, enteredName);
-					} else {
-						getBestGuessInGuestList(enteredName).then(function (guessedName) {
-							if (nameDist(guessedName.name, enteredName) >= 8)
-								onNameMatchFailure()
-							else
-								confirmCloseMatch(user, guessedName, enteredName)
-						});
-					}
-				})
+				focusFirstField();
 			}
 		};
 
@@ -301,10 +289,31 @@
 	}
 
 	function renderWithoutUser() {
-		var onSubmit = function (e) {
+		// Clear last set of names
+		while (namesNode.firstChild) {
+			namesNode.removeChild(namesNode.firstChild);
+		}
+
+		statusNode.innerText = "";
+
+		function onSubmit(e) {
 			e.preventDefault();
-			alert("Something went wrong. Please refresh the page and try again.")
-		};
+			
+			var enteredName = document.getElementById("inv-name").value;
+			findNameInGuestList(enteredName, function (found, matchedName) {
+				if (found) {
+					onNameMatchSuccess(matchedName, enteredName);
+					return;
+				}
+
+				getBestGuessInGuestList(enteredName).then(function (guessedName) {
+					if (nameDist(guessedName.name, enteredName) >= MAX_NAME_DIST)
+						onNameMatchFailure()
+					else
+						confirmCloseMatch(guessedName, enteredName)
+				});
+			});
+		}
 
 		form.addEventListener("submit", onSubmit);
 		return function () { 
@@ -318,9 +327,12 @@
 		cleanupLast();
 		cleanupLast = user ? renderWithUser(user) : renderWithoutUser();
 
-		// Oh: We didn't log in yet!
-		if (!user) {
-			firebase.auth().signInAnonymously();
+		if (user) {
+			form.classList.add("on-second-stage");
+			focusFirstField();
+		} else {
+			form.classList.remove("on-second-stage");
+			document.getElementById("inv-name").focus();
 		}
 	});
 
