@@ -41,7 +41,7 @@
 			{
 				id: "meal",
 				els: f_meal_all,
-				validationMessage: canAttend && f_meal_selected.value ? null : "Please make a meal selection.",
+				validationMessage: !canAttend || f_meal_selected.value ? null : "Please make a meal selection.",
 				value: f_meal_selected.value || "",
 				reset: function () { f_meal_all.forEach(function (el) { el.checked = false }) }
 			},
