@@ -31,7 +31,8 @@ const pageContent = {
 	"engagementphotos.html": htmlOfMD("../dev/engagementphotos.md"),
 	"rsvp.html": contentUsingBuildId('../dev/rsvp.html'),
 	"viewrsvps.html": contentUsingBuildId('../dev/viewrsvps.html'),
-	"registry.html": contentOf("../dev/registry.html")
+	"registry.html": contentOf("../dev/registry.html"),
+	"lodging.html": htmlOfMD("../dev/lodging.md")
 };
 
 // Render each of the pages to an appropriate file
