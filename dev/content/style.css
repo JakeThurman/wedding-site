@@ -128,6 +128,14 @@ img {
 	box-shadow: -1px 1px 5px -1px #757575;
 }
 
+a:hover img {
+    box-shadow: -1px 1px 15px -1px #757575;
+}
+
+a:active img, a:focus img {
+    box-shadow: -1px 1px 15px 0px #1c1d27;
+}
+
 a {
 	color: #08A4BD;
 	text-decoration: none;
