@@ -1,5 +1,7 @@
 ## Engagement Photos by Jessica Peterson
 
+<p></p>
+
 ![Engagement Photo](./content/images/Melissa_Lueken_Favorites-0001.jpg)
 
 ![Engagement Photo](./content/images/Melissa_Lueken_Favorites-0002.jpg)
