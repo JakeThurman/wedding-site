@@ -32,7 +32,9 @@ const pageContent = {
 	"rsvp.html": contentUsingBuildId('../dev/rsvp.html'),
 	"viewrsvps.html": contentUsingBuildId('../dev/viewrsvps.html'),
 	"registry.html": contentOf("../dev/registry.html"),
-	"lodging.html": htmlOfMD("../dev/lodging.md")
+	"lodging.html": htmlOfMD("../dev/lodging.md"),
+	"kristin_photos.html": htmlOfMD("../dev/kristin-photos.md"),
+	"jessica_photos.html": htmlOfMD("../dev/jessica-photos.md"),
 };
 
 // Render each of the pages to an appropriate file

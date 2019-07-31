@@ -8,7 +8,7 @@
 
 ![Hampton Inn Building](./content/images/hampton.png)
 
-**Address**: `7806 N. Route 91, Peoria, IL 61615`
+**Address**: 7806 N. Route 91, Peoria, IL 61615
 
 **Phone**: [(309)-589-0001](tel:+13095890001)
 
@@ -36,7 +36,7 @@
 
 ![Pere Marquette Building](./content/images/pere-marquette.png)
 
-**Address**: `501 Main Street, Peoria, IL 61602`
+**Address**: 501 Main Street, Peoria, IL 61602
 
 **Phone**: [(309)-637-6500](tel:+13096376500)
 

@@ -68,20 +68,20 @@ header .link-container a {
 	cursor: pointer;
 	height: 100%;
 	font-size: 1.5rem;
-	padding: 1.2rem;
-	padding-left: 0;
+	line-height: 4.3rem;
+    padding: 0 0.7rem;
 }
 
-/* NOTE: 425px is a manually tuned constant based off
-         off of the 2 items in the header.
+/* NOTE: 520px is a manually tuned constant based off
+         off of the 3 items in the header.
 */
-@media (max-width: 425px) {
+@media (max-width: 520px) {
 	header {
 		flex-direction: column;
 	}
 
 	header .link-container {
-		padding-left: 1rem;
+		padding-left: .5rem;
 	}
 
 	h1 {
