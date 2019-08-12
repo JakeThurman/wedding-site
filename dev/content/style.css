@@ -102,15 +102,6 @@ header .link-container a {
 	height: 1px;
 }
 
-#md-content h3:after {
-	border-bottom: 1px solid #2f2f2f;
-	content: '';
-	width: 1.5rem;
-	display: block;
-	margin: 0 auto;
-	height: 1px;
-}
-
 h2 + p {
 	text-indent: 1.25rem;
 }
