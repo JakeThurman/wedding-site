@@ -39,9 +39,14 @@
 					return a.timestamp - b.timestamp
 				});
 
-			var timestamps = rsvps.map(function (rsvp) { return rsvp.timestamp });
+			// We also include a 0 timestamp in 
+			//  so that if there aren't actaully 
+			//  any responses yet, sorting doesn't
+			//  break. All people with no response
+			//  are stuck at the end.
+			var timestamps = rsvps.map(function (rsvp) { return rsvp.timestamp }).concat([0]);
 			var newestResponse = new Date(Math.max.apply(null, timestamps));
-
+			
 			// This is the Label shown on gray seperator lines
 			var guestInfo = person.guestInfo || {};
 			var nameIsCorrect = guestInfo.enteredName === guestInfo.name;
@@ -53,6 +58,10 @@
 				newestResponse: newestResponse,
 				label: label,
 				nameIsCorrect: nameIsCorrect,
+				timestamp: {
+					long: rsvps.length ? moment(newestResponse).format('llll') : "[No Response]",
+					rel: rsvps.length ? moment(newestResponse).fromNow() : "",
+				},
 			}
 		}).sort(function (a, b) {
 			return b.newestResponse - a.newestResponse
