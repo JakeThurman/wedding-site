@@ -122,7 +122,7 @@
 			if (result.value)
 				onNameMatchSuccess(guessedName, enteredName)
 			else
-				onNameMatchFailure()
+				onNameMatchFailure(enteredName, guessedName)
 		})
 	}
 
@@ -159,11 +159,18 @@
 		});
 	}
 
-	function onNameMatchFailure() {
+	function onNameMatchFailure(name, optionalGuessedName) {
 		Swal.fire(
 			"We couldn't find your name.", 
 			"Try checking with altername forms of your name (i.e., Josh vs. Joshua). If you continue to see this issue, please contact Jake/Melissa.",
 			"error")
+
+		// Log this failure to the DB
+		firebase.database().ref("failed_names").push({
+			name: name,
+			incorrectGuess: optionalGuessedName,
+			fingerprint: (new ClientJS()).getFingerprint(),
+		});
 	}
 
 	function onSignOut() {
@@ -316,7 +323,7 @@
 
 				getBestGuessInGuestList(enteredName).then(function (guessedName) {
 					if (nameDist(guessedName.name, enteredName) >= MAX_NAME_DIST)
-						onNameMatchFailure()
+						onNameMatchFailure(enteredName)
 					else
 						confirmCloseMatch(guessedName, enteredName)
 				});
@@ -325,7 +332,7 @@
 
 		form.addEventListener("submit", onSubmit);
 		return function () { 
-			form.removeEventListener("submit", onSubmit);
+			form.removeEventListener("submit", onSubmit)
 		};
 	}
 
