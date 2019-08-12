@@ -38,11 +38,9 @@
 
 **Address**: 501 Main Street, Peoria, IL 61602
 
-**Phone**: [(309)-637-6500](tel:+13096376500)
+**Phone**: [(800)-410-9914](tel:+18004109914) <br/>(*Just mention that you are with the Lueken/Thurman wedding block*)
 
-**Website**: [www.marriott.com](https://www.marriott.com/hotels/travel/piamc-peoria-marriott-pere-marquette/)
-
-**Group Code**: `Lueken / Thurman Wedding Room Block`
+**Website**: [www.marriott.com](https://www.marriott.com/events/start.mi?id=1564586840933&key=GRP)
 
 > This hotel is 7 minutes from the reception venue and about 20 minutes from church.
 > They will provide free shuttle service to and from the wedding reception.
