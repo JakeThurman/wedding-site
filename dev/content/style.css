@@ -366,6 +366,7 @@ td:not(:first-child) {
 table td:first-child {
 	font-weight: bold;
 	padding-left: 25px;
+	white-space: nowrap;
 }
 
 .staged .first-stage,
