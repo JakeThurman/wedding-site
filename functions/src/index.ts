@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions'
 import * as nodemailer  from 'nodemailer'
 import * as admin from 'firebase-admin'
+import { firebaseConfig } from 'firebase-functions';
 const { htmlEncode } = require('htmlencode')
 const postmarkTransport = require('nodemailer-postmark-transport')
 
@@ -60,8 +61,10 @@ const mailTransport = nodemailer.createTransport(postmarkTransport({
     auth: { apiKey: postMarkConfig.key }
 }))
 
-//export const sendTooManyEmails = functions.database.ref("users").onWrite(async (change) => {
-export const dailyEmail = functions.pubsub.schedule("every 1 day").onRun(async () => {    
+export const manualTriggerEmail = functions.database.ref("force_email").onWrite(sendNewUserEmail);
+export const dailyEmail = functions.pubsub.schedule("every 1 day").onRun(sendNewUserEmail);
+
+async function sendNewUserEmail() {
     const allUsers = await getAllUsers();
 
     // Find all of the users with new responses
@@ -73,12 +76,12 @@ export const dailyEmail = functions.pubsub.schedule("every 1 day").onRun(async (
     // Collect the list of guests we haven't heard back from.
     const guestsStillWaitingOn = await getRemainingGuests(allUsers);
 
-    sendEmail(newResponses, guestsStillWaitingOn);
+    await sendEmail(newResponses, guestsStillWaitingOn);
 
     // Mark the responses we've already sent emails for.
     const updates = toDict(newResponses.map(user => [`${user.uid}/emailsSent`, user.rsvps.length]));
     await admin.database().ref("users").update(updates);
-});
+}
 
 async function getAllUsers(): Promise<CleanedUser[]> {
     const usersRef = admin.database().ref("users");
@@ -145,7 +148,12 @@ function sanitizeAndSortUsers(users: Dict<RawUser>): CleanedUser[] {
     });
 }
 
-function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: ExpectedGuest[]) {
+async function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: ExpectedGuest[]) {
+    const emailToUse: { to: string, from: string, fromName: string } = await admin.database()
+                                          .ref("addressForNewResponseEmail")
+                                          .once("value")
+                                          .then(snap => snap.val());
+    
     const stillWaitingContent = guestsStillWaitingOn.map(g => `${g.name} (${g.maxGuests})`)
                                                     .map(txt => `<li>${htmlEncode(txt)}</li>`)
 
@@ -161,10 +169,10 @@ function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: ExpectedGuest[
             <h2>${htmlEncode(u.label)}</h2>
             <ul>${u.rsvps.map(getRsvpItem)}</ul>
         <li>`)
-    
+
     const mailOptions = {
-        from: '"melissaandjake.com" <noreply@melissaandjake.com>',
-        to: `jacob@thurmans.com`,
+        from: `"${emailToUse.fromName}" <${emailToUse.from}`,
+        to: emailToUse.to,
         subject: `${newUsers.length} New Response${newUsers.length > 1 ? "s" : ""}`,
         html: `
             <html>

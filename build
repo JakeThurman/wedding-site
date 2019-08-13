@@ -9,3 +9,9 @@ sh build
 
 popd
 
+pushd functions 
+
+npm run build
+
+popd
+
