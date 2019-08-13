@@ -60,8 +60,8 @@ const mailTransport = nodemailer.createTransport(postmarkTransport({
     auth: { apiKey: postMarkConfig.key }
 }))
 
-export const sendTooManyEmails = functions.database.ref("users").onWrite(async (change) => {
-//export const dailyEmail = functions.pubsub.schedule("every 1 day").onRun(async () => {    
+//export const sendTooManyEmails = functions.database.ref("users").onWrite(async (change) => {
+export const dailyEmail = functions.pubsub.schedule("every 1 day").onRun(async () => {    
     const allUsers = await getAllUsers();
 
     // Find all of the users with new responses
