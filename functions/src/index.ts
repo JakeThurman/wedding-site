@@ -178,10 +178,10 @@ async function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: Expected
             <html>
                 <body>
                     <h1>New Responses</h1>
-                    <ul>${newResponseItems}</ul>
+                    <ul>${newResponseItems.join("")}</ul>
                     <br/>
                     <h1>Still waiting on responses from:</h1>
-                    <ul>${stillWaitingContent}</ul>
+                    <ul>${stillWaitingContent.join("")}</ul>
                 </body>
             </html>`,
     }
