@@ -1,7 +1,6 @@
 import * as functions from 'firebase-functions'
 import * as nodemailer  from 'nodemailer'
 import * as admin from 'firebase-admin'
-import { firebaseConfig } from 'firebase-functions';
 const { htmlEncode } = require('htmlencode')
 const postmarkTransport = require('nodemailer-postmark-transport')
 
