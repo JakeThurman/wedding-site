@@ -102,7 +102,23 @@ async function getRemainingGuests(existingUsers:CleanedUser[]): Promise<Expected
     const allRsvps = existingUsers.reduce((curr, next) => next.rsvps.concat(curr), [] as CleanedResponse[]);
     allRsvps.forEach(r => !responseNames.has(r.name.toLowerCase()) && responseNames.add(r.name.toLowerCase()));
 
-    return guests.filter(g => !responseNames.has(g.name.toLowerCase()));
+    return guests.filter(g => !responseNames.has(g.name.toLowerCase()))
+                 .sort(guestSorter);
+}
+
+function guestSorter(a: ExpectedGuest, b: ExpectedGuest) {
+    const aNames = a.name.toLowerCase().split(" ")
+    const bNames = b.name.toLowerCase().split(" ")
+
+    // Sort by last name
+    if(aNames[aNames.length - 1] < bNames[bNames.length - 1]) return -1;
+    if(aNames[aNames.length - 1] > bNames[bNames.length - 1]) return 1;
+
+    // Then by first name
+    if(aNames[0] < bNames[0]) return -1;
+    if(aNames[0] > bNames[0]) return 1;
+
+    return 0;
 }
 
 function toDict<T>(pairs: [string, T][]) {
