@@ -96,9 +96,13 @@ async function getRemainingGuests(existingUsers:CleanedUser[]): Promise<Expected
                                                .once("value")
                                                .then(snap => snap.val());
 
-    const responseNames = new Set(existingUsers.map(u => u.guestListName));
+    // Skip all of the guests and all of their +1s.
+    const responseNames = new Set(existingUsers.map(u => u.guestListName.toLowerCase()));
+    
+    const allRsvps = existingUsers.reduce((curr, next) => next.rsvps.concat(curr), [] as CleanedResponse[]);
+    allRsvps.forEach(r => !responseNames.has(r.name.toLowerCase()) && responseNames.add(r.name.toLowerCase()));
 
-    return guests.filter(g => !responseNames.has(g.name));
+    return guests.filter(g => !responseNames.has(g.name.toLowerCase()));
 }
 
 function toDict<T>(pairs: [string, T][]) {
@@ -166,8 +170,8 @@ async function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: Expected
 
     const newResponseItems = newUsers.map(u => `
         <li>
-            <h2>${htmlEncode(u.label)}</h2>
-            <ul>${u.rsvps.map(getRsvpItem)}</ul>
+            <h3>${htmlEncode(u.label)}</h3>
+            <ul>${u.rsvps.map(getRsvpItem).join("")}</ul>
         <li>`)
 
     const mailOptions = {
@@ -180,7 +184,7 @@ async function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: Expected
                     <h1>New Responses</h1>
                     <ul>${newResponseItems.join("")}</ul>
                     <br/>
-                    <h1>Still waiting on responses from:</h1>
+                    <h1>Guests Who Haven't Responded (${stillWaitingContent.length}):</h1>
                     <ul>${stillWaitingContent.join("")}</ul>
                 </body>
             </html>`,
