@@ -70,9 +70,6 @@ async function sendNewUserEmail() {
     // Find all of the users with new responses
     const newResponses = allUsers.filter(user => user.emailsSent !== user.rsvps.length);
 
-    if (!newResponses.length)
-        return;
-
     // Collect the list of guests we haven't heard back from.
     const guestsStillWaitingOn = await getRemainingGuests(allUsers);
 
@@ -198,7 +195,7 @@ async function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: Expected
             <html>
                 <body>
                     <h1>New Responses</h1>
-                    <ul>${newResponseItems.join("")}</ul>
+                    <ul>${newResponseItems.join("") || "<li><i>No New Responses</i><li>"}</ul>
                     <br/>
                     <h1>Guests Who Haven't Responded (${stillWaitingContent.length}):</h1>
                     <ul>${stillWaitingContent.join("")}</ul>
