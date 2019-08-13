@@ -122,7 +122,7 @@
 			if (result.value)
 				onNameMatchSuccess(guessedName, enteredName)
 			else
-				onNameMatchFailure(enteredName, guessedName)
+				onNameMatchFailure(enteredName, guessedName.name)
 		})
 	}
 
@@ -168,7 +168,7 @@
 		// Log this failure to the DB
 		firebase.database().ref("failed_names").push({
 			name: name,
-			incorrectGuess: optionalGuessedName || "----",
+			incorrectGuess: optionalGuessedName || "<No Guess Made>",
 			timestamp: (new Date()).toISOString(),
 			fingerprint: (new ClientJS()).getFingerprint(),
 		});
