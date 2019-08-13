@@ -168,7 +168,7 @@
 		// Log this failure to the DB
 		firebase.database().ref("failed_names").push({
 			name: name,
-			incorrectGuess: optionalGuessedName,
+			incorrectGuess: optionalGuessedName || "----",
 			timestamp: (new Date()).toISOString(),
 			fingerprint: (new ClientJS()).getFingerprint(),
 		});
