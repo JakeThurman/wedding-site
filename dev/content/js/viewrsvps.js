@@ -1,6 +1,48 @@
 (function () {
 	"use strict";
 
+	var csvUtil = {
+		toCSV: function(items) {
+			var header = Object.keys(items[0]);
+			var csv = items.map(function (row) {
+				return header.map(function (fieldName) { 
+					return JSON.stringify(row[fieldName])
+				}).join(',')
+			});
+			csv.unshift(header.join(','));
+			return csv.join("\r\n");
+		},
+		downloadAsCSV: function(items, dataName) {
+			// Convert the name to a file name
+			var filename = dataName.replace(/[^a-z0-9]/gi, '_').substring(0, 100) + ".csv"
+
+			// Create a uri for the data
+			var csvContent = csvUtil.toCSV(items)
+			var fullText = "data:text/csv;charset=utf-8," + csvContent
+			var encodedUri = encodeURI(fullText)
+
+			// Attach this to an element
+			var link = document.createElement("a")
+			link.setAttribute("href", encodedUri)
+			link.setAttribute("download", filename)
+			document.body.appendChild(link) // Required for FF
+
+			link.click()
+
+			// Cleanup
+			document.body.removeChild(link)
+		}
+	}
+
+	var handleDownloadRef = { current: null };
+	var downloadButton = document.getElementById('download-csv');
+	downloadButton.addEventListener("click", function () { 
+		if (handleDownloadRef.current)
+			handleDownloadRef.current()
+		else 
+			alert("Data is still loading...")
+	})
+
 	var src = document.getElementById("output-template").innerHTML;
 	var template = Handlebars.compile(src);
 	var container = document.getElementById("output");
@@ -107,7 +149,6 @@
 				&& meal !== "pork"
 		});
 		
-
 		container.innerHTML = template({
 			count: {
 				total: canCount + cannotCount,
@@ -124,6 +165,23 @@
 			},
 			people: people,
 		});
+
+		handleDownloadRef.current = function () {
+			var allRsvps = people.reduce(function (curr, next) { 
+				return curr.concat(next.rsvps) 
+			}, [])
+
+			var data = allRsvps.map(function (r) {
+				return {
+					"Name": r.name,
+					"Meal": r.meal,
+					"Can Attend": r.cannot_attend ? "N" : "Y",
+					"Note": r.note.replace("\n", ''),
+				}
+			})
+
+			csvUtil.downloadAsCSV(data, "responses")
+		}
 	});
 
 })();

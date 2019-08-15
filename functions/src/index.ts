@@ -1,11 +1,19 @@
+import groupBy from 'lodash.groupby';
 import * as functions from 'firebase-functions'
-import * as nodemailer  from 'nodemailer'
+import * as nodemailer from 'nodemailer'
 import * as admin from 'firebase-admin'
 const { htmlEncode } = require('htmlencode')
 const postmarkTransport = require('nodemailer-postmark-transport')
 
 // Base types
 type Dict<T> = { [id: string]: T }
+
+type FailedAttempt = {
+    fingerprint: number
+    incorrectGuess: string,
+    name: string,
+    timestamp: string
+}
 
 type ExpectedGuest = {
     maxGuests: number
@@ -66,17 +74,26 @@ export const dailyEmail = functions.pubsub.schedule("every 1 day").onRun(sendNew
 async function sendNewUserEmail() {
     const allUsers = await getAllUsers();
 
-    // Find all of the users with new responses
     const newResponses = allUsers.filter(user => user.emailsSent !== user.rsvps.length);
-
-    // Collect the list of guests we haven't heard back from.
     const guestsStillWaitingOn = await getRemainingGuests(allUsers);
+    const failedRsvps = await getNewFailedAttempts();
 
-    await sendEmail(newResponses, guestsStillWaitingOn);
+    const emailHtml = getEmailHtml(newResponses, guestsStillWaitingOn, failedRsvps);
+    await sendEmail(emailHtml, newResponses.length);
 
     // Mark the responses we've already sent emails for.
     const updates = toDict(newResponses.map(user => [`${user.uid}/emailsSent`, user.rsvps.length]));
     await admin.database().ref("users").update(updates);
+}
+
+async function getNewFailedAttempts(): Promise<FailedAttempt[]> {
+    const results: FailedAttempt[] = await admin.database()
+                                                .ref("failed_names")
+                                                .once("value")
+                                                .then(snap => Object.values(snap.val() || {}));
+
+    // TODO: filter seen
+    return results;
 }
 
 async function getAllUsers(): Promise<CleanedUser[]> {
@@ -164,12 +181,8 @@ function sanitizeAndSortUsers(users: Dict<RawUser>): CleanedUser[] {
     });
 }
 
-async function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: ExpectedGuest[]) {
-    const emailToUse: { to: string, from: string, fromName: string } = await admin.database()
-                                          .ref("addressForNewResponseEmail")
-                                          .once("value")
-                                          .then(snap => snap.val());
-    
+function getEmailHtml(newUsers: CleanedUser[], guestsStillWaitingOn: ExpectedGuest[], failedRsvps: FailedAttempt[]) {
+
     const stillWaitingContent = guestsStillWaitingOn.map(g => `${g.name} (${g.maxGuests})`)
                                                     .map(txt => `<li>${htmlEncode(txt)}</li>`)
 
@@ -178,28 +191,54 @@ async function sendEmail(newUsers: CleanedUser[], guestsStillWaitingOn: Expected
             <div><b>Name</b>: ${htmlEncode(r.name)}</div>
             <div><b>Eating</b>: ${htmlEncode(r.meal)}</div>
             <div><b>Note</b>: <span style='white-space:pre-wrap'>${htmlEncode(r.note)}</span></div>
+            <br/>
         </li>`
 
     const newResponseItems = newUsers.map(u => `
         <li>
             <h3>${htmlEncode(u.label)}</h3>
             <ul>${u.rsvps.map(getRsvpItem).join("")}</ul>
-        <li>`)
+        </li>`)
 
+    const getFailedRsvpItem = (f: FailedAttempt) => 
+        `<li>${htmlEncode(f.name)}</li>`
+
+    const fingerPrintGroups = Object.values(groupBy(failedRsvps, r => r.fingerprint));
+    const failedRsvpItems = fingerPrintGroups.map((r, i) => `
+        <li>
+            <b>Person #${i+1}</b>
+            <ul>${r.sort().map(getFailedRsvpItem).join("")}</ul>
+        </li>`)
+
+    return `
+    <html>
+        <body>
+            <h1>New Responses (${newResponseItems.length})</h1>
+            <ul>${newResponseItems.join("") || "<li><i>No New Responses</i></li>"}</ul>
+            <br/>
+            <br/>
+            <h1>Failed Responses (${failedRsvpItems.length})</h1>
+            <ul>${failedRsvpItems.join("") || "<li><i>No Failed Responses</i></li>"}</ul>
+            <br/>
+            <br/>
+            <h1>Guests Who Haven't Responded (${stillWaitingContent.length}):</h1>
+            <ul>${stillWaitingContent.join("")}</ul>
+        </body>
+    </html>`
+}
+
+async function sendEmail(html: string, numNewUsers: number) {
+    const emailToUse: { to: string, from: string, fromName: string } = 
+        await admin.database()
+                   .ref("addressForNewResponseEmail")
+                   .once("value")
+                   .then(snap => snap.val());
+    
     const mailOptions = {
         from: `"${emailToUse.fromName}" <${emailToUse.from}`,
         to: emailToUse.to,
-        subject: `${newUsers.length} New Response${newUsers.length > 1 ? "s" : ""}`,
-        html: `
-            <html>
-                <body>
-                    <h1>New Responses</h1>
-                    <ul>${newResponseItems.join("") || "<li><i>No New Responses</i><li>"}</ul>
-                    <br/>
-                    <h1>Guests Who Haven't Responded (${stillWaitingContent.length}):</h1>
-                    <ul>${stillWaitingContent.join("")}</ul>
-                </body>
-            </html>`,
+        subject: `${numNewUsers} New Response${numNewUsers === 1 ? "" : "s"}`,
+        html,
     }
 
     mailTransport.sendMail(mailOptions)
