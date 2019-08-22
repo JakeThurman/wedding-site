@@ -149,7 +149,7 @@ function sanitizeAndSortUsers(users: Dict<RawUser>): CleanedUser[] {
                 name: r.name || "!No Name Given!",
                 note: r.note || "",
                 meal: r.meal || "Unknown",
-                can_attend: r.can_attend ? "Y" : "N", // Fliped for easy defaulting
+                can_attend: r.can_attend ? "Y" : "N",
             }))
             .sort(function (a, b) {
                 return a.timestamp.valueOf() - b.timestamp.valueOf()
@@ -189,6 +189,7 @@ function getEmailHtml(newUsers: CleanedUser[], guestsStillWaitingOn: ExpectedGue
     const getRsvpItem = (r: CleanedResponse) => `
         <li>
             <div><b>Name</b>: ${htmlEncode(r.name)}</div>
+            <div><b>Can Attend:</b>: ${htmlEncode(r.can_attend)}</div>
             <div><b>Eating</b>: ${htmlEncode(r.meal)}</div>
             <div><b>Note</b>: <span style='white-space:pre-wrap'>${htmlEncode(r.note)}</span></div>
             <br/>

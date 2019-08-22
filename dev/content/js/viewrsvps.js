@@ -139,6 +139,7 @@
 		var chickenEaterCount = mealCount("chicken");
 		var beefEaterCount = mealCount("beef");
 		var porkEaterCount = mealCount("pork");
+		var vegetarianEaterCount = mealCount("vegetarian");
 
 		// Check for invalid meals (except for people that just can't come!)
 		var invalidEaterCout = countOfRsvpsWhere(people, function (person) {
@@ -146,7 +147,7 @@
 			return !person.cannot_attend
 				&& meal !== "chicken" 
 				&& meal !== "beef"
-				&& meal !== "pork"
+				&& meal !== "vegetarian"
 		});
 		
 		container.innerHTML = template({
@@ -160,6 +161,7 @@
 					chicken: chickenEaterCount,
 					beef: beefEaterCount,
 					pork: porkEaterCount,
+					vegetarian: vegetarianEaterCount,
 					invalid: invalidEaterCout,
 				},
 			},
