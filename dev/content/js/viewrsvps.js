@@ -34,6 +34,13 @@
 		}
 	}
 
+	var sendEmailButton = document.getElementById('send-update-email');
+	sendEmailButton.addEventListener("click", function () { 
+		firebase.database().ref("force_email").transaction(c => c + 1).then(function () {
+			alert("Email triggered.");
+		})
+	})
+
 	var handleDownloadRef = { current: null };
 	var downloadButton = document.getElementById('download-csv');
 	downloadButton.addEventListener("click", function () { 
