@@ -2,7 +2,7 @@
 
 <div style="text-align: center;margin-bottom:10px">
 	<button type="button" id="download-csv">Download as CSV</button>
-	<button type="button" id="send-update-email">Trigger Update Email</button>
+	<button type="button" id="send-update-email">Send Update Email</button>
 </div>
 
 <div id="output">
@@ -39,39 +39,41 @@
 		</div>
 		<br/>
 		<p><i>Responses are sorted as newest first</i></p>
-		<table>
-			<thead>
-				<th>Name</th>
-				<th>Can Attend</th>
-				<th>Entr&#233;e</th>
-				<th>Note</th>
-			</thead>
-			<tbody>
-				{{#each people}}	
-					<tr>
-						<th colspan='4'>
-							<div style="display:flex;flex-direction:row;justify-content:space-between">
-								<span style="align-self:center">{{label}}:</span>
-								<span style="display:flex;flex-direction:column;text-align:right">
-									<b>{{timestamp.rel}}</b>
-									<span>{{timestamp.long}}</span>
-								</span>
-							</div>
-						</th>
-					</tr>
-
-					{{#each rsvps}}
-						{{#if cannot_attend}}<tr class="bad" data-uid={{uid}} data-rid={{rid}}>
-						{{else}}             <tr data-uid={{uid}} data-rid={{rid}}> {{/if}}
-							<td>{{name}}</td>
-							<td>{{#if cannot_attend}}N{{else}}Y{{/if}}</td>
-							<td>{{meal}}</td>
-							<td><pre>{{note}}</pre></td>
+		<div class="rsvp-results">
+			<table>
+				<thead>
+					<th>Name</th>
+					<th>Can Attend</th>
+					<th>Entr&#233;e</th>
+					<th>Note</th>
+				</thead>
+				<tbody>
+					{{#each people}}	
+						<tr>
+							<th colspan='4'>
+								<div style="display:flex;flex-direction:row;justify-content:space-between">
+									<span style="align-self:center">{{label}}:</span>
+									<span style="display:flex;flex-direction:column;text-align:right">
+										<b>{{timestamp.rel}}</b>
+										<span>{{timestamp.long}}</span>
+									</span>
+								</div>
+							</th>
 						</tr>
+
+						{{#each rsvps}}
+							{{#if cannot_attend}}<tr class="bad" data-uid={{uid}} data-rid={{rid}}>
+							{{else}}             <tr data-uid={{uid}} data-rid={{rid}}> {{/if}}
+								<td>{{name}}</td>
+								<td>{{#if cannot_attend}}N{{else}}Y{{/if}}</td>
+								<td>{{meal}}</td>
+								<td><pre>{{note}}</pre></td>
+							</tr>
+						{{/each}}
 					{{/each}}
-				{{/each}}
-			</tbody>
-		</table>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </script>
 

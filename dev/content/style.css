@@ -427,7 +427,17 @@ table td:first-child {
 	display: flex;
 	flex-direction: row;
 }
+@media (max-width: 800px) {
+	.rsvp-stats {
+		flex-direction: column;
+	}
+}
 .rsvp-stats > * {
 	padding: 0 5px;
 	flex: 1;
+}
+.rsvp-results {
+	overflow: auto;
+    margin: 0 -2rem -2rem -2rem;
+    padding: 0 2rem 2rem 2rem;
 }
