@@ -1,6 +1,31 @@
 (function () {
 	"use strict";
 
+	var isFirstLoad = true;
+
+	function getTime() {
+		var today = new Date();
+		return today.getHours() + ":" + today.getMinutes()
+	}
+
+	function notifyMe(txt) {
+		if (window.Notification && Notification.permission === "granted") {
+			new Notification(txt)
+		}
+		else if (window.Notification && Notification.permission !== "denied") {
+		  Notification.requestPermission(function (status) {
+			// If the user said okay
+			if (status === "granted")
+				new Notification(txt);
+			else
+			  alert(txt);
+		  });
+		}
+		else {
+		  alert(txt);
+		}
+	}
+
 	var csvUtil = {
 		toCSV: function(items) {
 			var header = Object.keys(items[0]);
@@ -67,6 +92,9 @@
 	var ref = firebase.database().ref("users");
 
 	ref.on('value', function(snapshot) {
+		if (!isFirstLoad)
+			notifyMe("New wedding responses have arived (at " + getTime() +  ")");
+
 		var data = snapshot.val() || {};
 		var people = Object.keys(data).map(function (uid) {
 			var person = data[uid];
@@ -191,6 +219,8 @@
 
 			csvUtil.downloadAsCSV(data, "responses")
 		}
+
+		isFirstLoad = false;
 	});
 
 })();
