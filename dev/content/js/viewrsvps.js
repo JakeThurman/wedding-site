@@ -3,26 +3,33 @@
 
 	var isFirstLoad = true;
 
-	function getTime() {
-		var today = new Date();
-		return today.getHours() + ":" + today.getMinutes()
-	}
-
 	function notifyMe(txt) {
-		if (window.Notification && Notification.permission === "granted") {
-			new Notification(txt)
-		}
-		else if (window.Notification && Notification.permission !== "denied") {
-		  Notification.requestPermission(function (status) {
-			// If the user said okay
-			if (status === "granted")
-				new Notification(txt);
+		function show() {
+			if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+				navigator.serviceWorker.getRegistrations().then(function (rs) {
+					if (rs.length)
+					rs[0].showNotification(txt);
+					else
+						new Notification(txt);
+				});
+			}
 			else
-			  alert(txt);
-		  });
+				new Notification(txt);
+		}
+
+		if (!window.Notification || Notification.permission === "denied") {
+			alert(txt);
+		}
+		else if (Notification.permission === "granted") {
+			show();
 		}
 		else {
-		  alert(txt);
+			Notification.requestPermission(function (status) {
+				if (status === "granted")
+					show();
+				else
+					alert(txt);
+			});
 		}
 	}
 
@@ -93,7 +100,7 @@
 
 	ref.on('value', function(snapshot) {
 		if (!isFirstLoad)
-			notifyMe("New wedding responses have arived (at " + getTime() +  ")");
+			notifyMe("New wedding responses have arived!");
 
 		var data = snapshot.val() || {};
 		var people = Object.keys(data).map(function (uid) {
