@@ -145,6 +145,7 @@
 				name: matchedName.name,
 				maxGuests: matchedName.maxGuests,
 				enteredName: enteredName,
+				fingerprint: (new ClientJS()).getFingerprint(),
 			});
 		});
 

@@ -1,7 +1,11 @@
 (function () {
 	"use strict";
 
-	var isFirstLoad = true;
+	var state = {
+		isFirstLoad: true,
+		people: [],
+		failedRsvps: [],
+	};
 
 	function notifyMe(txt) {
 		function show() {
@@ -68,9 +72,9 @@
 
 	var sendEmailButton = document.getElementById('send-update-email');
 	sendEmailButton.addEventListener("click", function () { 
-		firebase.database().ref("force_email").transaction(c => c + 1).then(function () {
-			alert("Email triggered.");
-		})
+		firebase.database().ref("force_email")
+			.transaction(function (c) { return c + 1; })
+			.then(function () { alert("Email triggered."); })
 	})
 
 	var handleDownloadRef = { current: null };
@@ -96,13 +100,42 @@
 		return people.filter(predicate).length;
 	}
 
-	var ref = firebase.database().ref("users");
+	firebase.database().ref("failed_names").on("value", function (snapshot) {
+		var data = snapshot.val() || {};
+		var values = Object.keys(data).map(function (k) { return data[k]; });
 
-	ref.on('value', function(snapshot) {
-		if (!isFirstLoad)
+		var groups = groupBy(values, function (r) { return r.fingerprint });
+		var groupValues =  Object.keys(groups).map(function (k) { return groups[k]; })
+
+		var sortedGroups = groupValues.sort(function (a, b) {
+			var aTimestamps = a.map(function (item) { return new Date(item.timestamp); });
+			var bTimestamps = b.map(function (item) { return new Date(item.timestamp); });
+
+			var maxA = new Date(Math.max.apply(null, aTimestamps));
+			var maxB = new Date(Math.max.apply(null, bTimestamps));
+
+			return maxB - maxA;
+		});
+
+		var sortedGroupsWithSortedItems = sortedGroups.map(function (group) {
+			return group.sort(function (a, b) {
+				return new Date(a.timestamp) - new Date(b.timestamp)
+			})
+		});
+
+		state.failedRsvps = sortedGroupsWithSortedItems;
+
+		render();
+	});
+
+	firebase.database().ref("users").on('value', function(snapshot) {
+		if (state.isFirstLoad)
+			state.isFirstLoad = false;
+		else
 			notifyMe("New wedding responses have arived!");
 
 		var data = snapshot.val() || {};
+
 		var people = Object.keys(data).map(function (uid) {
 			var person = data[uid];
 
@@ -138,6 +171,7 @@
 
 			return {
 				uid: uid,
+				fingerprint: guestInfo.fingerprint,
 				rsvps: rsvps,
 				newestResponse: newestResponse,
 				label: label,
@@ -149,6 +183,74 @@
 			}
 		}).sort(function (a, b) {
 			return b.newestResponse - a.newestResponse
+		});
+
+		state.people = people;
+
+		handleDownloadRef.current = function () {
+			var allRsvps = people.reduce(function (curr, next) { 
+				return curr.concat(next.rsvps) 
+			}, [])
+
+			var data = allRsvps.map(function (r) {
+				return {
+					"Name": r.name,
+					"Meal": r.meal,
+					"Can Attend": r.cannot_attend ? "N" : "Y",
+					"Note": r.note.replace("\n", ''),
+				}
+			})
+
+			csvUtil.downloadAsCSV(data, "responses")
+		}
+
+		render();
+	});
+
+	function groupBy(arr, criteria) {
+		return arr.reduce(function (obj, item) {
+	
+			// Check if the criteria is a function to run on the item or a property of it
+			var key = typeof criteria === 'function' ? criteria(item) : item[criteria];
+	
+			// If the key doesn't exist yet, create it
+			if (!obj.hasOwnProperty(key)) {
+				obj[key] = [];
+			}
+	
+			// Push the value to the object
+			obj[key].push(item);
+	
+			// Return the object to the next item in the loop
+			return obj;
+	
+		}, {});
+	};
+
+	function render() {
+		var people = state.people;
+		var failedRsvps = state.failedRsvps.map(function (items, i) {
+			var mappedItems = items.map(function (item) {
+				var timestamp = moment(item.timestamp);
+
+				return {
+					name: item.name,
+					guessedName: item.incorrectGuess || "<No Guess Made>",
+					timestamp: {
+						long: timestamp.format('ll') + " " + timestamp.format('LTS'),
+						rel: timestamp.fromNow(),
+					},
+				};
+			});
+
+			var fingerprint = items[0].fingerprint;
+
+			return {
+				n: i + 1,
+				items: mappedItems,
+				fingerprint: fingerprint,
+				realid: people.filter(function (f) { return f.fingerprint === fingerprint })[0],
+			};
 		});
 
 		var canCount = countOfRsvpsWhere(people, function (rsvp) {
@@ -194,6 +296,7 @@
 		
 		container.innerHTML = template({
 			count: {
+				failed: failedRsvps.length,
 				total: canCount + cannotCount,
 				can: canCount,
 				cannot: cannotCount,
@@ -208,26 +311,10 @@
 				},
 			},
 			people: people,
+			failedRsvps: failedRsvps,
 		});
+	}
 
-		handleDownloadRef.current = function () {
-			var allRsvps = people.reduce(function (curr, next) { 
-				return curr.concat(next.rsvps) 
-			}, [])
-
-			var data = allRsvps.map(function (r) {
-				return {
-					"Name": r.name,
-					"Meal": r.meal,
-					"Can Attend": r.cannot_attend ? "N" : "Y",
-					"Note": r.note.replace("\n", ''),
-				}
-			})
-
-			csvUtil.downloadAsCSV(data, "responses")
-		}
-
-		isFirstLoad = false;
-	});
+	window.appState = state
 
 })();

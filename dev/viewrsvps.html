@@ -30,9 +30,10 @@
 			<div>
 				<p>Potential Issues:</p>
 				<ul>
+					<li><b>{{count.failed}}</b> failed to respond.</li>
 					<li><b>{{count.duplicates}}</b> duplicated response(s).</li>
 					<li><b>{{count.wrongNames}}</b> incorrect name(s).</li>
-					<li><b>{{count.meal.invalid}}</b> invalid meal choice.</li>
+					<li><b>{{count.meal.invalid}}</b> invalid meal choice(s).</li>
 					<li><b>{{count.meal.pork}}</b> chose to eat <i>Pork</i></li>
 				</ul>
 			</div>
@@ -49,7 +50,7 @@
 				</thead>
 				<tbody>
 					{{#each people}}	
-						<tr>
+						<tr data-uid="{{uid}}">
 							<th colspan='4'>
 								<div style="display:flex;flex-direction:row;justify-content:space-between">
 									<span style="align-self:center">{{label}}:</span>
@@ -62,12 +63,52 @@
 						</tr>
 
 						{{#each rsvps}}
-							{{#if cannot_attend}}<tr class="bad" data-uid={{uid}} data-rid={{rid}}>
-							{{else}}             <tr data-uid={{uid}} data-rid={{rid}}> {{/if}}
+							{{#if cannot_attend}}<tr class="bad" data-uid="{{../uid}}" data-rid="{{rid}}">
+							{{else}}             <tr data-uid="{{../uid}}" data-rid="{{rid}}"> {{/if}}
 								<td>{{name}}</td>
 								<td>{{#if cannot_attend}}N{{else}}Y{{/if}}</td>
 								<td>{{meal}}</td>
 								<td><pre>{{note}}</pre></td>
+							</tr>
+						{{/each}}
+					{{/each}}
+				</tbody>
+			</table>
+
+			<h3 style="margin-top: 200px;margin-bottom: 30px">Failed Rsvps:</h3>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Name Typed</th>
+						<th>Incorrect Guess By Algorithm</th>
+						<th>Timestamp</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{#each failedRsvps}}
+						<tr data-fingerprint="{{fingerprint}}">
+							<th colspan='3'>
+								Person #{{n}}
+								<b>
+									{{#if realid}}
+										[DID RSVP as {{realid.label}}]
+									{{else}}
+										[May never have rsvp'd!]
+									{{/if}}
+								</b>
+							</th>
+						</tr>
+
+						{{#each items}}
+							{{#if ../realid}}<tr data-fingerprint="{{../fingerprint}}" style="text-decoration: line-through">
+							{{else}}         <tr data-fingerprint="{{../fingerprint}}" class="bad"> {{/if}}
+								<td>{{name}}</td>
+								<td>{{guessedName}}</td>
+								<td style="text-align:right">
+									<div><b>{{timestamp.rel}}</b></div>
+									<div>{{timestamp.long}}</div>
+								</td>
 							</tr>
 						{{/each}}
 					{{/each}}
