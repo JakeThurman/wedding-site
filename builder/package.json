@@ -7,6 +7,6 @@
   "license": "ISC",
   "dependencies": {
     "handlebars": "^4.1.2",
-    "showdown": "^1.9.0"
+    "showdown": "^1.9.1"
   }
 }
